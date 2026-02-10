@@ -1,0 +1,1050 @@
+[
+  {
+    "id": "city-international-hospital",
+    "name": "Bệnh viện Quốc tế City (CIH)",
+    "website": "https://cih.com.vn",
+    "crawl_urls": [
+      "https://cih.com.vn/vi/khoa-phong",
+      "https://cih.com.vn/vi/dich-vu-y-te",
+      "https://cih.com.vn/vi/goi-kham"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "028 6280 3333",
+    "city": "TP.HCM",
+    "district": "Bình Tân",
+    "address": "Số 3, Đường số 17A, P. Bình Trị Đông B, Q. Bình Tân, TP.HCM",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "tieu-hoa"
+    ],
+    "notes": "Bệnh viện quốc tế đa khoa 21 chuyên khoa. Thế mạnh: Sản phụ khoa, Nhi khoa, Hỗ trợ sinh sản, Tiêu hóa gan mật. Có BHYT.",
+    "services": []
+  },
+  {
+    "id": "simmed",
+    "name": "Phòng khám Đa khoa SIM Med",
+    "website": "https://simmed.vn",
+    "crawl_urls": [
+      "https://simmed.vn/chuyen-khoa",
+      "https://simmed.vn/goi",
+      "https://simmed.vn/gia-dich-vu"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "1900 25 25 35",
+    "city": "TP.HCM",
+    "district": "Tân Phú",
+    "address": "Tòa nhà Richstar 2 – RS5, 239-241 Đường Hòa Bình, P. Hiệp Tân, Q. Tân Phú, TP.HCM",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "da-lieu",
+      "tieu-hoa"
+    ],
+    "notes": "Phòng khám đa khoa theo chuẩn JCI. Thế mạnh: Nhi, Sản-Phụ khoa, Nội khoa, Tiêm chủng. Khoa Nhi phục vụ ngoài giờ đến 19h.",
+    "services": []
+  },
+  {
+    "id": "sante-hospital",
+    "name": "Bệnh viện Sante",
+    "website": "https://santehospital.vn",
+    "crawl_urls": [
+      "https://santehospital.vn/chuyen-khoa",
+      "https://santehospital.vn/dich-vu"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "tieu-hoa"
+    ],
+    "notes": "Bệnh viện tư nhân đa khoa.",
+    "services": []
+  },
+  {
+    "id": "vinmec",
+    "name": "Bệnh viện Đa khoa Quốc tế Vinmec",
+    "website": "https://vinmec.com",
+    "crawl_urls": [
+      "https://www.vinmec.com/vie/goi-kham-suc-khoe/",
+      "https://www.vinmec.com/vie/ho-tro-sinh-san/",
+      "https://www.vinmec.com/vie/nhi-khoa/",
+      "https://www.vinmec.com/vie/tieu-hoa/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "1800 599 920",
+    "city": "TP.HCM",
+    "district": "Bình Thạnh",
+    "address": "Cổng 3, 208 Nguyễn Hữu Cảnh, P. 22, Q. Bình Thạnh, TP.HCM (Central Park)",
+    "branches": [
+      {
+        "id": "vinmec-hcm",
+        "city": "TP.HCM",
+        "district": "Bình Thạnh",
+        "address": "Cổng 3, 208 Nguyễn Hữu Cảnh, P. 22, Q. Bình Thạnh, TP.HCM"
+      },
+      {
+        "id": "vinmec-hn",
+        "city": "Hà Nội",
+        "district": "Long Biên",
+        "address": "458 Minh Khai, Q. Hai Bà Trưng, Hà Nội"
+      }
+    ],
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "da-lieu",
+      "tieu-hoa",
+      "std-sti"
+    ],
+    "notes": "Hệ thống bệnh viện quốc tế lớn nhất Việt Nam. Có trung tâm IVF (OLEA Fertility). Chuẩn quốc tế JCI.",
+    "services": []
+  },
+  {
+    "id": "phuong-nam-ivf",
+    "name": "Bệnh viện Phương Nam - Trung tâm Hỗ trợ sinh sản IVF Phương Nam",
+    "website": "https://benhvienphuongnam.com",
+    "crawl_urls": [
+      "https://benhvienphuongnam.com/dich-vu/",
+      "https://benhvienphuongnam.com/ho-tro-sinh-san/",
+      "https://saigon.ivfphuongchau.com"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "Quận 7",
+    "address": "180 Cao Lỗ, P. 4, Q. 8, TP.HCM",
+    "specialties": [
+      "sinh-san",
+      "nhi"
+    ],
+    "notes": "Thành viên Tập đoàn Y tế Phương Châu, đạt JCI Enterprise. Có IVF Phương Châu Sài Gòn tại chỗ. Thế mạnh: Sản phụ khoa, Nhi, IVF/IUI/ICSI.",
+    "services": []
+  },
+  {
+    "id": "columbia-asia-binh-duong",
+    "name": "Bệnh viện Quốc tế Columbia Asia Bình Dương",
+    "website": "https://columbiaasia.com/binh-duong",
+    "crawl_urls": [
+      "https://columbiaasia.com/binh-duong/vi/cac-dich-vu",
+      "https://columbiaasia.com/binh-duong/vi/goi-kham"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "0274 3822 666",
+    "city": "Bình Dương",
+    "district": "Thuận An",
+    "address": "8 Đại Lộ Bình Dương, P. Thuận Giao, TX. Thuận An, Bình Dương",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "tieu-hoa"
+    ],
+    "notes": "Bệnh viện quốc tế đạt tiêu chuẩn JCI, phục vụ khu vực Bình Dương và vùng lân cận TP.HCM.",
+    "services": []
+  },
+  {
+    "id": "phuong-chau-ivf",
+    "name": "Bệnh viện Quốc tế Phương Châu (IVF Phương Châu)",
+    "website": "https://ivfphuongchau.com",
+    "crawl_urls": [
+      "https://ivfphuongchau.com/dich-vu/",
+      "https://ivfphuongchau.com/gia-dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "0292 3828 282",
+    "city": "Cần Thơ",
+    "district": "Ninh Kiều",
+    "address": "300 Nguyễn Văn Cừ (nối dài), P. An Khánh, Q. Ninh Kiều, Cần Thơ",
+    "specialties": [
+      "sinh-san"
+    ],
+    "notes": "Trung tâm IVF đầu tiên và duy nhất tại ĐBSCL đạt chuẩn JCI và RTAC. Tỷ lệ thành công IVF ~74% (phụ nữ dưới 35 tuổi). Hơn 3.000 em bé ra đời.",
+    "services": []
+  },
+  {
+    "id": "diab",
+    "name": "DiaB - Cộng đồng Sống khỏe cùng đái tháo đường",
+    "website": "https://diab.com.vn",
+    "crawl_urls": [
+      "https://diab.com.vn/dich-vu/",
+      "https://diab.com.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "tieu-hoa"
+    ],
+    "notes": "Chuyên biệt về đái tháo đường và bệnh chuyển hóa. Tư vấn dinh dưỡng, quản lý đường huyết.",
+    "services": []
+  },
+  {
+    "id": "happy-baby",
+    "name": "Hệ thống Phòng khám Happy Baby",
+    "website": "https://happybaby.vn",
+    "crawl_urls": [
+      "https://happybaby.vn/dich-vu/",
+      "https://happybaby.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "nhi"
+    ],
+    "notes": "Hệ thống phòng khám chuyên Nhi khoa và Sản phụ khoa.",
+    "services": []
+  },
+  {
+    "id": "mat-315",
+    "name": "Hệ thống Phòng khám Mắt 315",
+    "website": "https://mat315.vn",
+    "crawl_urls": [
+      "https://mat315.vn/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [],
+    "notes": "Chuyên khoa Mắt. Không thuộc nhóm 5 chuyên khoa chính - giữ trong data để tham chiếu nếu AI khuyến cáo.",
+    "services": []
+  },
+  {
+    "id": "tim-mach-315",
+    "name": "Hệ thống Phòng khám Tim mạch - Tiểu đường 315 (Lão khoa 315)",
+    "website": "https://315.vn",
+    "crawl_urls": [
+      "https://315.vn/dich-vu/",
+      "https://315.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "tieu-hoa"
+    ],
+    "notes": "Tim mạch, Tiểu đường, Lão khoa. Liên quan đến chuyên khoa Tiêu hóa và bệnh chuyển hóa.",
+    "services": []
+  },
+  {
+    "id": "long-chau-vaccine",
+    "name": "Hệ thống Tiêm chủng Long Châu",
+    "website": "https://nhathuoclongchau.com.vn/tiem-chung",
+    "crawl_urls": [
+      "https://nhathuoclongchau.com.vn/tiem-chung/lich-tiem-chung-tre-em",
+      "https://nhathuoclongchau.com.vn/tiem-chung/vaccine"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "1800 599 908",
+    "city": "TP.HCM",
+    "district": "Nhiều chi nhánh",
+    "address": "Nhiều chi nhánh toàn quốc",
+    "branches": [
+      {
+        "id": "long-chau-hcm",
+        "city": "TP.HCM",
+        "address": "Nhiều chi nhánh"
+      },
+      {
+        "id": "long-chau-hn",
+        "city": "Hà Nội",
+        "address": "Nhiều chi nhánh"
+      }
+    ],
+    "specialties": [
+      "nhi"
+    ],
+    "notes": "Hệ thống tiêm chủng rộng lớn toàn quốc. Vaccine cho trẻ em và người lớn. Phù hợp khi AI khuyến cáo tiêm chủng bổ sung.",
+    "services": []
+  },
+  {
+    "id": "medlatec",
+    "name": "Hệ thống Y tế MEDLATEC",
+    "website": "https://medlatec.vn",
+    "crawl_urls": [
+      "https://medlatec.vn/tin-tuc/dich-vu",
+      "https://medlatec.vn/goi-kham"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "1900 56 56 00",
+    "city": "Hà Nội",
+    "district": "Ba Đình",
+    "address": "42-44 Nghĩa Dũng, P. Phúc Xá, Q. Ba Đình, Hà Nội",
+    "branches": [
+      {
+        "id": "medlatec-hn",
+        "city": "Hà Nội",
+        "address": "42-44 Nghĩa Dũng, Q. Ba Đình"
+      },
+      {
+        "id": "medlatec-hcm",
+        "city": "TP.HCM",
+        "address": "Xem website"
+      }
+    ],
+    "specialties": [
+      "nhi",
+      "da-lieu",
+      "sinh-san",
+      "tieu-hoa",
+      "std-sti"
+    ],
+    "notes": "Hệ thống xét nghiệm và phòng khám đa khoa lớn, phủ rộng toàn quốc. Thế mạnh xét nghiệm và khám chuyên khoa.",
+    "services": []
+  },
+  {
+    "id": "pk-dhyd1",
+    "name": "Phòng khám Bệnh viện Đại học Y Dược 1",
+    "website": "https://pkdhyd.com.vn",
+    "crawl_urls": [
+      "https://pkdhyd.com.vn/dich-vu/",
+      "https://pkdhyd.com.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "028 3952 5858",
+    "city": "TP.HCM",
+    "district": "Quận 5",
+    "address": "215 Hồng Bàng, P. 11, Q. 5, TP.HCM",
+    "specialties": [
+      "nhi",
+      "da-lieu",
+      "sinh-san",
+      "tieu-hoa",
+      "std-sti"
+    ],
+    "notes": "Phòng khám trực thuộc Bệnh viện Đại học Y Dược TP.HCM. Đội ngũ giảng viên - bác sĩ đầu ngành. Đa chuyên khoa.",
+    "services": []
+  },
+  {
+    "id": "clover-clinic",
+    "name": "Phòng khám Chuyên khoa Da liễu - Thẩm mỹ Clover Clinic",
+    "website": "https://cloverclinic.vn",
+    "crawl_urls": [
+      "https://cloverclinic.vn/dich-vu/",
+      "https://cloverclinic.vn/bang-gia/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "da-lieu"
+    ],
+    "notes": "Chuyên khoa Da liễu và Thẩm mỹ da.",
+    "services": []
+  },
+  {
+    "id": "maia-maia",
+    "name": "Phòng khám Chuyên khoa Da liễu Maia&Maia",
+    "website": "https://maiamaia.vn",
+    "crawl_urls": [
+      "https://maiamaia.vn/dich-vu/",
+      "https://maiamaia.vn/bang-gia/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "da-lieu"
+    ],
+    "notes": "Phòng khám Da liễu chuyên sâu.",
+    "services": []
+  },
+  {
+    "id": "amv-gentical",
+    "name": "Phòng khám Đa khoa AMV Gentical",
+    "website": "https://amvgentical.com",
+    "crawl_urls": [
+      "https://amvgentical.com/dich-vu/",
+      "https://amvgentical.com/std-sti/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "std-sti",
+      "sinh-san"
+    ],
+    "notes": "Đa khoa, có thế mạnh về STD/STI và Nam khoa/Phụ khoa.",
+    "services": []
+  },
+  {
+    "id": "timec",
+    "name": "Phòng khám Đa khoa Quốc tế TIMEC",
+    "website": "https://timec.vn",
+    "crawl_urls": [
+      "https://timec.vn/dich-vu/",
+      "https://timec.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "tieu-hoa",
+      "std-sti"
+    ],
+    "notes": "Phòng khám đa khoa quốc tế.",
+    "services": []
+  },
+  {
+    "id": "vigor-health",
+    "name": "Phòng khám Đa khoa Vigor Health",
+    "website": "https://vigorhealth.vn",
+    "crawl_urls": [
+      "https://vigorhealth.vn/dich-vu/",
+      "https://vigorhealth.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "da-lieu",
+      "tieu-hoa"
+    ],
+    "notes": "Phòng khám đa khoa.",
+    "services": []
+  },
+  {
+    "id": "pensilia",
+    "name": "Phòng khám Da liễu - Thẩm mỹ Pensilia",
+    "website": "https://pensilia.vn",
+    "crawl_urls": [
+      "https://pensilia.vn/dich-vu/",
+      "https://pensilia.vn/bang-gia/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "da-lieu"
+    ],
+    "notes": "Chuyên khoa Da liễu và Thẩm mỹ.",
+    "services": []
+  },
+  {
+    "id": "drip-hydration",
+    "name": "Phòng khám Drip Hydration",
+    "website": "https://driphydration.vn",
+    "crawl_urls": [
+      "https://driphydration.vn/dich-vu/",
+      "https://driphydration.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "da-lieu"
+    ],
+    "notes": "Dịch vụ truyền dịch, vitamin IV, chăm sóc da từ bên trong.",
+    "services": []
+  },
+  {
+    "id": "tokyo-family-clinic",
+    "name": "Phòng khám Gia Đình Tokyo - Tokyo Family Clinic",
+    "website": "https://tokyoclinic.vn",
+    "crawl_urls": [
+      "https://tokyoclinic.vn/dich-vu/",
+      "https://tokyoclinic.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "da-lieu",
+      "tieu-hoa"
+    ],
+    "notes": "Phòng khám gia đình theo tiêu chuẩn Nhật Bản. Đa khoa, thân thiện với người nước ngoài.",
+    "services": []
+  },
+  {
+    "id": "nhi-dong-315",
+    "name": "Phòng khám Nhi đồng 315",
+    "website": "https://nhidong315.vn",
+    "crawl_urls": [
+      "https://nhidong315.vn/dich-vu/",
+      "https://nhidong315.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "nhi"
+    ],
+    "notes": "Chuyên khoa Nhi đồng.",
+    "services": []
+  },
+  {
+    "id": "bs-ho-minh-tam",
+    "name": "Phòng khám Nội khoa trực tuyến BS. Hồ Minh Tâm",
+    "website": "",
+    "crawl_urls": [],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "tieu-hoa"
+    ],
+    "notes": "Bác sĩ Nội khoa trực tuyến. Phù hợp với tư vấn từ xa.",
+    "services": [
+      {
+        "id": "tu-van-noi-khoa-online",
+        "name": "Tư vấn Nội khoa trực tuyến",
+        "specialty": "tieu-hoa",
+        "description": "Khám và tư vấn Nội khoa, Tiêu hóa qua hình thức online",
+        "price_range": "Liên hệ",
+        "duration": "20-30 phút",
+        "notes": "Phù hợp cho tư vấn ban đầu và theo dõi điều trị"
+      }
+    ]
+  },
+  {
+    "id": "bs-nguyen-van-chuyen",
+    "name": "Phòng khám Nội khoa trực tuyến BS. Nguyễn Văn Chuyên",
+    "website": "",
+    "crawl_urls": [],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "tieu-hoa"
+    ],
+    "notes": "Bác sĩ Nội khoa trực tuyến.",
+    "services": [
+      {
+        "id": "tu-van-noi-khoa-online",
+        "name": "Tư vấn Nội khoa trực tuyến",
+        "specialty": "tieu-hoa",
+        "description": "Khám và tư vấn Nội khoa qua hình thức online",
+        "price_range": "Liên hệ",
+        "duration": "20-30 phút",
+        "notes": ""
+      }
+    ]
+  },
+  {
+    "id": "phu-san-315",
+    "name": "Phòng khám Phụ Sản 315",
+    "website": "https://phusanviet315.vn",
+    "crawl_urls": [
+      "https://phusanviet315.vn/dich-vu/",
+      "https://phusanviet315.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "sinh-san"
+    ],
+    "notes": "Chuyên khoa Sản Phụ khoa.",
+    "services": []
+  },
+  {
+    "id": "phuc-ngoc",
+    "name": "Phòng khám Sản - Phụ khoa Phúc Ngọc",
+    "website": "https://phucngoc.vn",
+    "crawl_urls": [
+      "https://phucngoc.vn/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "sinh-san"
+    ],
+    "notes": "Chuyên khoa Sản Phụ khoa.",
+    "services": []
+  },
+  {
+    "id": "dr-marie",
+    "name": "Phòng khám Sản Phụ khoa Dr. Marie",
+    "website": "https://drmarie.vn",
+    "crawl_urls": [
+      "https://drmarie.vn/dich-vu/",
+      "https://drmarie.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "sinh-san",
+      "std-sti"
+    ],
+    "notes": "Sản Phụ khoa, có dịch vụ STD/STI cho phụ nữ.",
+    "services": []
+  },
+  {
+    "id": "bs-le-thi-dep",
+    "name": "Phòng khám Tim mạch và Siêu âm Tim BS.CKII Lê Thị Đẹp",
+    "website": "",
+    "crawl_urls": [],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [],
+    "notes": "Chuyên Tim mạch. Không thuộc nhóm 5 chuyên khoa chính nhưng giữ trong data.",
+    "services": []
+  },
+  {
+    "id": "mens-health",
+    "name": "Trung tâm sức khỏe Nam Giới Men's Health",
+    "website": "https://menshealth.vn",
+    "crawl_urls": [
+      "https://menshealth.vn/dich-vu/",
+      "https://menshealth.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "std-sti",
+      "sinh-san"
+    ],
+    "notes": "Chuyên về sức khỏe nam giới: Nam khoa, STD/STI, vô sinh nam, rối loạn cương dương.",
+    "services": []
+  },
+  {
+    "id": "nhc-viet-nam",
+    "name": "Trung tâm Tâm lý trị liệu NHC Việt Nam",
+    "website": "https://nhcvietnam.vn",
+    "crawl_urls": [
+      "https://nhcvietnam.vn/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [],
+    "notes": "Tâm lý trị liệu. Không thuộc 5 chuyên khoa chính nhưng giữ trong data.",
+    "services": []
+  },
+  {
+    "id": "myrehab-matsuoka",
+    "name": "Trung tâm Trị liệu và Phục hồi chức năng Myrehab – Matsuoka",
+    "website": "https://myrehab-matsuoka.com",
+    "crawl_urls": [
+      "https://myrehab-matsuoka.com/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "Hà Nội",
+    "district": "",
+    "address": "",
+    "specialties": [],
+    "notes": "Phục hồi chức năng theo chuẩn Nhật. Không thuộc 5 chuyên khoa chính.",
+    "services": []
+  },
+  {
+    "id": "greenlab",
+    "name": "Trung tâm Xét nghiệm GreenLab",
+    "website": "https://greenlab.vn",
+    "crawl_urls": [
+      "https://greenlab.vn/dich-vu/",
+      "https://greenlab.vn/bang-gia/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "std-sti",
+      "sinh-san"
+    ],
+    "notes": "Trung tâm xét nghiệm. Phù hợp cho xét nghiệm STD/STI và tầm soát sinh sản.",
+    "services": []
+  },
+  {
+    "id": "diag",
+    "name": "Trung tâm Xét nghiệm Y khoa Diag",
+    "website": "https://diag.vn",
+    "crawl_urls": [
+      "https://diag.vn/dich-vu/",
+      "https://diag.vn/bang-gia/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "028 3622 2888",
+    "city": "TP.HCM",
+    "district": "Quận 3",
+    "address": "Nhiều chi nhánh TP.HCM và Hà Nội",
+    "specialties": [
+      "std-sti",
+      "sinh-san",
+      "da-lieu"
+    ],
+    "notes": "Hệ thống xét nghiệm uy tín. Có xét nghiệm STD/STI, HPV, HIV, nội tiết tố sinh sản, xét nghiệm da liễu.",
+    "services": []
+  },
+  {
+    "id": "mic",
+    "name": "Trung tâm Xét nghiệm Y khoa MIC",
+    "website": "https://mic.com.vn",
+    "crawl_urls": [
+      "https://mic.com.vn/dich-vu/",
+      "https://mic.com.vn/bang-gia/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "Hà Nội",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "std-sti",
+      "sinh-san"
+    ],
+    "notes": "Trung tâm xét nghiệm y khoa tại Hà Nội.",
+    "services": []
+  },
+  {
+    "id": "nreci",
+    "name": "Viện Nghiên cứu & Tư vấn dinh dưỡng NRECI",
+    "website": "https://nreci.org",
+    "crawl_urls": [
+      "https://nreci.org/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "nhi",
+      "tieu-hoa"
+    ],
+    "notes": "Dinh dưỡng lâm sàng và tư vấn dinh dưỡng. Phù hợp với Nhi (chậm tăng cân, suy dinh dưỡng) và Tiêu hóa (IBS, bệnh Crohn).",
+    "services": []
+  },
+  {
+    "id": "vdd-hcm",
+    "name": "Viện Nghiên cứu Dinh dưỡng TP.HCM",
+    "website": "https://viendinhduong.vn",
+    "crawl_urls": [
+      "https://viendinhduong.vn/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "028 3932 7250",
+    "city": "TP.HCM",
+    "district": "Quận 10",
+    "address": "180 Lê Văn Sĩ, P. 10, Q. Phú Nhuận, TP.HCM",
+    "specialties": [
+      "nhi",
+      "tieu-hoa"
+    ],
+    "notes": "Đơn vị nghiên cứu và tư vấn dinh dưỡng nhà nước. Có khám dinh dưỡng nhi, người lớn.",
+    "services": []
+  },
+  {
+    "id": "bao-son",
+    "name": "Bệnh viện Đa khoa Bảo Sơn",
+    "website": "https://benhvienbaoson.vn",
+    "crawl_urls": [
+      "https://benhvienbaoson.vn/chuyen-khoa/",
+      "https://benhvienbaoson.vn/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "024 3795 2828",
+    "city": "Hà Nội",
+    "district": "Nam Từ Liêm",
+    "address": "52 Đường 22 Tháng 12, Q. Nam Từ Liêm, Hà Nội",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "da-lieu",
+      "tieu-hoa"
+    ],
+    "notes": "Bệnh viện đa khoa lớn tại Hà Nội. Đa chuyên khoa.",
+    "services": []
+  },
+  {
+    "id": "hung-viet",
+    "name": "Hệ thống Y tế Hưng Việt",
+    "website": "https://hungviet.org",
+    "crawl_urls": [
+      "https://hungviet.org/dich-vu/",
+      "https://hungviet.org/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "024 6274 2828",
+    "city": "Hà Nội",
+    "district": "Ba Đình",
+    "address": "34A Đường Đại Cồ Việt, Q. Hai Bà Trưng, Hà Nội",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "tieu-hoa",
+      "da-lieu"
+    ],
+    "notes": "Hệ thống y tế đa khoa tại Hà Nội.",
+    "services": []
+  },
+  {
+    "id": "sunnycare",
+    "name": "Viện Tâm Lý Sunnycare",
+    "website": "https://sunnycare.vn",
+    "crawl_urls": [
+      "https://sunnycare.vn/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [],
+    "notes": "Tâm lý trị liệu. Không thuộc 5 chuyên khoa chính nhưng giữ trong data.",
+    "services": []
+  },
+  {
+    "id": "yen-hoa-tam-than",
+    "name": "Phòng khám Chuyên khoa Tâm thần Yên Hòa",
+    "website": "https://phongkhamtamthanyenhoa.vn",
+    "crawl_urls": [
+      "https://phongkhamtamthanyenhoa.vn/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "Hà Nội",
+    "district": "Cầu Giấy",
+    "address": "Yên Hòa, Cầu Giấy, Hà Nội",
+    "specialties": [],
+    "notes": "Tâm thần. Không thuộc 5 chuyên khoa chính.",
+    "services": []
+  },
+  {
+    "id": "dolife",
+    "name": "Bệnh viện Quốc tế Dolife",
+    "website": "https://dolifehospital.vn",
+    "crawl_urls": [
+      "https://dolifehospital.vn/chuyen-khoa/",
+      "https://dolifehospital.vn/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "1800 1515",
+    "city": "Hà Nội",
+    "district": "Đống Đa",
+    "address": "Số 6 Lô A2 KĐT Southgate, P. Tứ Hiệp, Q. Thanh Trì, Hà Nội",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "da-lieu",
+      "tieu-hoa",
+      "std-sti"
+    ],
+    "notes": "Bệnh viện quốc tế đa khoa tại Hà Nội. Nhiều chuyên khoa.",
+    "services": []
+  },
+  {
+    "id": "tmh-sai-gon",
+    "name": "Bệnh viện Tai Mũi Họng Sài Gòn",
+    "website": "https://taimuihong.com.vn",
+    "crawl_urls": [
+      "https://taimuihong.com.vn/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "028 3930 1818",
+    "city": "TP.HCM",
+    "district": "Quận 3",
+    "address": "155B Trần Quốc Thảo, P. 9, Q. 3, TP.HCM",
+    "specialties": [],
+    "notes": "Chuyên khoa Tai Mũi Họng. Không thuộc 5 chuyên khoa chính.",
+    "services": []
+  },
+  {
+    "id": "pk-quoc-te-sai-gon",
+    "name": "Phòng khám Đa khoa Quốc tế Sài Gòn",
+    "website": "https://saigonclinic.com.vn",
+    "crawl_urls": [
+      "https://saigonclinic.com.vn/dich-vu/",
+      "https://saigonclinic.com.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "da-lieu",
+      "tieu-hoa",
+      "std-sti"
+    ],
+    "notes": "Phòng khám đa khoa quốc tế tại Sài Gòn.",
+    "services": []
+  },
+  {
+    "id": "sih-phu-san",
+    "name": "Bệnh Viện Phụ Sản Quốc Tế Sài Gòn SIH",
+    "website": "https://sihospital.vn",
+    "crawl_urls": [
+      "https://sihospital.vn/dich-vu/",
+      "https://sihospital.vn/sinh-san/",
+      "https://sihospital.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "028 3990 9090",
+    "city": "TP.HCM",
+    "district": "Quận 1",
+    "address": "Số 6-8 Nguyễn Lương Bằng, P. Tân Phú, Q. 7, TP.HCM",
+    "specialties": [
+      "sinh-san",
+      "nhi"
+    ],
+    "notes": "Bệnh viện Phụ Sản quốc tế chuyên sâu. Thế mạnh: Thai sản, hỗ trợ sinh sản, Nhi sơ sinh.",
+    "services": []
+  },
+  {
+    "id": "dha-healthcare",
+    "name": "Phòng khám Đa khoa DHA Healthcare",
+    "website": "https://dhahealthcare.vn",
+    "crawl_urls": [
+      "https://dhahealthcare.vn/dich-vu/",
+      "https://dhahealthcare.vn/goi-kham/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "nhi",
+      "sinh-san",
+      "da-lieu",
+      "tieu-hoa",
+      "std-sti"
+    ],
+    "notes": "Phòng khám đa khoa.",
+    "services": []
+  },
+  {
+    "id": "msc",
+    "name": "Phòng khám Đa khoa MSC",
+    "website": "https://msc.com.vn",
+    "crawl_urls": [
+      "https://msc.com.vn/dich-vu/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "std-sti",
+      "sinh-san"
+    ],
+    "notes": "Đa khoa, có thế mạnh về STD/STI.",
+    "services": []
+  },
+  {
+    "id": "bs-tran-tuy-phuong",
+    "name": "Phòng khám Sản Phụ Khoa - KHHGĐ BS. Trần Túy Phượng",
+    "website": "",
+    "crawl_urls": [],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "sinh-san"
+    ],
+    "notes": "Phòng khám cá nhân bác sĩ. Sản Phụ khoa và Kế hoạch hóa gia đình.",
+    "services": [
+      {
+        "id": "kham-san-phu-khoa",
+        "name": "Khám Sản Phụ khoa",
+        "specialty": "sinh-san",
+        "description": "Khám phụ khoa, thai sản, tư vấn kế hoạch hóa gia đình",
+        "price_range": "Liên hệ",
+        "duration": "30 phút",
+        "notes": ""
+      }
+    ]
+  },
+  {
+    "id": "lux-beauty",
+    "name": "Lux Beauty Center",
+    "website": "https://luxbeauty.vn",
+    "crawl_urls": [
+      "https://luxbeauty.vn/dich-vu/",
+      "https://luxbeauty.vn/bang-gia/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "da-lieu"
+    ],
+    "notes": "Thẩm mỹ và chăm sóc da chuyên sâu.",
+    "services": []
+  },
+  {
+    "id": "tao-do-da-lieu",
+    "name": "Phòng Khám Da Liễu Táo Đỏ",
+    "website": "https://taodo.vn",
+    "crawl_urls": [
+      "https://taodo.vn/dich-vu/",
+      "https://taodo.vn/bang-gia/"
+    ],
+    "booking_email": "dung.tran@hellobacsi.com",
+    "phone": "",
+    "city": "TP.HCM",
+    "district": "",
+    "address": "",
+    "specialties": [
+      "da-lieu"
+    ],
+    "notes": "Phòng khám Da liễu chuyên sâu.",
+    "services": []
+  }
+]

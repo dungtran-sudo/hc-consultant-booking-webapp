@@ -1,0 +1,37 @@
+[
+  {
+    "id": "nhi",
+    "label": "Nhi khoa",
+    "icon": "🧒",
+    "description": "Khám và tư vấn sức khỏe trẻ em từ sơ sinh đến 15 tuổi",
+    "color": "blue"
+  },
+  {
+    "id": "da-lieu",
+    "label": "Da liễu",
+    "icon": "🌿",
+    "description": "Các bệnh lý về da, tóc, móng và thẩm mỹ da",
+    "color": "green"
+  },
+  {
+    "id": "sinh-san",
+    "label": "Sinh sản",
+    "icon": "🌸",
+    "description": "Sản phụ khoa, hỗ trợ sinh sản, IVF, vô sinh hiếm muộn",
+    "color": "pink"
+  },
+  {
+    "id": "std-sti",
+    "label": "STD/STI",
+    "icon": "🔬",
+    "description": "Các bệnh lây truyền qua đường tình dục, xét nghiệm và điều trị",
+    "color": "purple"
+  },
+  {
+    "id": "tieu-hoa",
+    "label": "Tiêu hoá",
+    "icon": "🫁",
+    "description": "Các bệnh lý đường tiêu hóa, gan mật, đại tràng",
+    "color": "orange"
+  }
+]
