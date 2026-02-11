@@ -91,7 +91,7 @@ export default function PartnerDashboardPage() {
       <header className="bg-blue-600 text-white px-6 py-4">
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <div>
-            <h1 className="text-lg font-bold">Portal Đối Tác</h1>
+            <h1 className="text-lg font-bold">HelloBacsi Booking - Portal Đối Tác</h1>
             {partnerName && (
               <p className="text-sm text-blue-100">{partnerName}</p>
             )}
