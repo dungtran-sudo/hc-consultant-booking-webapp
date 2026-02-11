@@ -9,6 +9,7 @@ import BookingModal from '@/components/BookingModal';
 import PartnerSearch from '@/components/PartnerSearch';
 import specialtiesData from '@/data/specialties.json';
 import { filterPartners } from '@/lib/partners';
+import StaffAuthGate from '@/components/StaffAuthGate';
 import {
   Specialty,
   Partner,
@@ -81,6 +82,7 @@ export default function ConsultPage({
   }
 
   return (
+    <StaffAuthGate>
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-3xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
@@ -161,5 +163,6 @@ export default function ConsultPage({
         )}
       </main>
     </div>
+    </StaffAuthGate>
   );
 }

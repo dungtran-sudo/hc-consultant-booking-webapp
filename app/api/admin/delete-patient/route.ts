@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { hashPhone, revokeEncKey } from '@/lib/crypto';
+import { validateAdminAuth } from '@/lib/admin-auth';
 
 export async function POST(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {
+  if (!validateAdminAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

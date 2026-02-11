@@ -123,17 +123,23 @@ export interface BookingPayload {
   notes: string;
   consentVersion: string;
   consentTextHash: string;
+  consentTokenId?: string;
 }
 
 export interface MaskedBooking {
   id: string;
-  bookingNumber: number;
+  bookingNumber: string;
   serviceName: string;
   specialty: string;
   branchAddress: string;
   preferredDate: string;
   preferredTime: string;
+  status: string;
   createdAt: string;
+  confirmedAt?: string | null;
+  completedAt?: string | null;
+  partnerName?: string;
+  bookedByStaffName?: string | null;
 }
 
 export interface RevealedPII {

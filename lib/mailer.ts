@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
 });
 
 interface MaskedBookingEmail {
-  bookingNumber: number;
+  bookingNumber: string;
   serviceName: string;
   preferredDate: string;
   preferredTime: string;

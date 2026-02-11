@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Partner, Service, BookingPayload } from '@/lib/types';
 import { CURRENT_CONSENT } from '@/lib/consent';
 import ConsentModal from './ConsentModal';
+import ConsentQRScreen from './ConsentQRScreen';
 
 interface BookingModalProps {
   partner: Partner;
@@ -39,6 +40,8 @@ export default function BookingModal({
   const [error, setError] = useState('');
   const [showConsent, setShowConsent] = useState(false);
   const [consent, setConsent] = useState<{ version: string; hash: string } | null>(null);
+  const [qrConsent, setQrConsent] = useState<{ url: string; token: string; tokenId: string } | null>(null);
+  const [creatingToken, setCreatingToken] = useState(false);
 
   const branches = partner.branches || [
     { id: partner.id, city: partner.city, address: partner.address },
@@ -54,12 +57,41 @@ export default function BookingModal({
       return;
     }
 
-    if (!consent) {
-      setShowConsent(true);
-      return;
-    }
+    // Create consent token for QR flow
+    setCreatingToken(true);
+    setError('');
+    try {
+      const res = await fetch('/api/consent-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: form.phone,
+          partnerId: partner.id,
+          partnerName: partner.name,
+          serviceName: form.serviceName,
+        }),
+      });
 
-    await submitBooking(consent.version, consent.hash);
+      if (!res.ok) {
+        // Staff not logged in — fall back to old consent modal
+        setShowConsent(true);
+        setCreatingToken(false);
+        return;
+      }
+
+      const data = await res.json();
+      setQrConsent({ url: data.url, token: data.token, tokenId: data.tokenId });
+    } catch {
+      // Fallback to old consent modal
+      setShowConsent(true);
+    } finally {
+      setCreatingToken(false);
+    }
+  };
+
+  const handleQRAccepted = async () => {
+    // Patient accepted via QR — now submit booking with QR consent proof
+    await submitBooking(CURRENT_CONSENT.version, CURRENT_CONSENT.hash, qrConsent?.tokenId);
   };
 
   const handleConsentAccept = async (version: string, hash: string) => {
@@ -68,7 +100,7 @@ export default function BookingModal({
     await submitBooking(version, hash);
   };
 
-  const submitBooking = async (consentVersion: string, consentTextHash: string) => {
+  const submitBooking = async (consentVersion: string, consentTextHash: string, consentTokenId?: string) => {
     setLoading(true);
     setError('');
 
@@ -88,6 +120,7 @@ export default function BookingModal({
       notes: form.notes,
       consentVersion,
       consentTextHash,
+      consentTokenId,
     };
 
     try {
@@ -117,6 +150,33 @@ export default function BookingModal({
         <div className="bg-white rounded-xl p-8 max-w-md w-full text-center">
           <h3 className="text-lg font-bold text-blue-700 mb-2">Đặt lịch thành công!</h3>
           <p className="text-gray-600">Đối tác sẽ liên hệ xác nhận trong vòng 24 giờ.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show QR consent screen when token is created
+  if (qrConsent) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+          {loading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Đang tạo đặt lịch...</p>
+            </div>
+          ) : (
+            <ConsentQRScreen
+              consentUrl={qrConsent.url}
+              token={qrConsent.token}
+              onAccepted={handleQRAccepted}
+              onCancel={() => setQrConsent(null)}
+            />
+          )}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mt-4">
+              {error}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -194,10 +254,10 @@ export default function BookingModal({
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || creatingToken}
             className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
-            {loading ? 'Đang xử lý...' : 'Xác nhận đặt lịch'}
+            {loading || creatingToken ? 'Đang xử lý...' : 'Xác nhận đặt lịch'}
           </button>
         </form>
       </div>

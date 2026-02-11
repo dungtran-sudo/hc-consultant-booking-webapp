@@ -21,7 +21,7 @@ model Consent {
 
 model Booking {
   id             String   @id @default(cuid())
-  bookingNumber  Int      @default(autoincrement())
+  bookingNumber  String   @unique
   phoneHash      String
   sessionId      String
   patientNameEnc String
@@ -36,13 +36,19 @@ model Booking {
   preferredDate  String
   preferredTime  String
   encKeyId       String
+  status         String   @default("pending")
   isDeleted      Boolean  @default(false)
   createdAt      DateTime @default(now())
   expiresAt      DateTime
+  confirmedAt       DateTime?
+  completedAt       DateTime?
+  bookedByStaffId   String?
+  bookedByStaffName String?
 
   @@index([phoneHash])
   @@index([partnerId])
   @@index([expiresAt])
+  @@index([status])
   @@map("bookings")
 }
 
@@ -70,6 +76,47 @@ model AuditLog {
   @@index([bookingId])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+model Staff {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  email        String?
+  role         String   // "cs", "doctor", "admin"
+  passwordHash String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([role])
+  @@map("staff")
+}
+
+model ConsentToken {
+  id                String    @id @default(cuid())
+  token             String    @unique
+  phoneHash         String
+  partnerId         String
+  partnerName       String
+  serviceName       String
+  dataDescription   String
+  staffId           String
+  staffName         String
+  status            String    @default("pending")
+  patientIp         String?
+  patientUserAgent  String?
+  deviceFingerprint String?
+  otpCode           String?
+  otpSentAt         DateTime?
+  otpVerifiedAt     DateTime?
+  bookingId         String?
+  expiresAt         DateTime
+  createdAt         DateTime  @default(now())
+  acceptedAt        DateTime?
+
+  @@index([token])
+  @@index([staffId])
+  @@map("consent_tokens")
 }
 
 model DeletionRequest {

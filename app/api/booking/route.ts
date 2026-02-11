@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { encryptBookingPII, hashPhone } from '@/lib/crypto';
+import { encryptBookingPII } from '@/lib/crypto';
+import { generateBookingNumber } from '@/lib/booking-number';
 import { validateConsentHash } from '@/lib/consent';
 import { sendBookingEmail } from '@/lib/mailer';
 import { BookingPayload } from '@/lib/types';
+import { getSessionStaff } from '@/lib/staff-auth';
 import partnersData from '@/data/partners.json';
 import { Partner } from '@/lib/types';
 
@@ -47,9 +49,16 @@ export async function POST(request: Request) {
       },
     });
 
+    // Check staff session
+    const staff = await getSessionStaff();
+
+    // Generate custom booking number
+    const bookingNumber = await generateBookingNumber(payload.partnerName, payload.phone);
+
     // Create booking
     const booking = await prisma.booking.create({
       data: {
+        bookingNumber,
         phoneHash: encrypted.phoneHash,
         sessionId: payload.sessionId,
         patientNameEnc: encrypted.patientNameEnc,
@@ -64,15 +73,18 @@ export async function POST(request: Request) {
         preferredDate: payload.preferredDate,
         preferredTime: payload.preferredTime,
         encKeyId: encrypted.encKeyId,
+        status: 'pending',
         expiresAt,
+        bookedByStaffId: staff?.staffId || null,
+        bookedByStaffName: staff?.staffName || null,
       },
     });
 
     // Audit log
     await prisma.auditLog.create({
       data: {
-        actorType: 'system',
-        actorId: 'booking-api',
+        actorType: staff ? 'staff' : 'system',
+        actorId: staff ? staff.staffName : 'booking-api',
         action: 'consent_given',
         bookingId: booking.id,
         metadata: JSON.stringify({
@@ -82,6 +94,17 @@ export async function POST(request: Request) {
         ip,
       },
     });
+
+    // Link consent token to booking if provided
+    if (payload.consentTokenId) {
+      await prisma.consentToken.update({
+        where: { id: payload.consentTokenId },
+        data: { bookingId: booking.id },
+      }).catch(() => {
+        // Non-critical: log but don't fail the booking
+        console.warn('Failed to link consent token to booking');
+      });
+    }
 
     // Send masked email to partner
     const partner = (partnersData as Partner[]).find(

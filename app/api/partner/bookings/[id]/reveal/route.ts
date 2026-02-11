@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionPartnerId } from '@/lib/partner-auth';
+import { validateAdminAuth } from '@/lib/admin-auth';
 import { prisma } from '@/lib/db';
 import { decryptBookingPII } from '@/lib/crypto';
 
@@ -7,9 +8,10 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const partnerId = await getSessionPartnerId();
+  const isAdmin = validateAdminAuth(request);
+  const partnerId = isAdmin ? null : await getSessionPartnerId();
 
-  if (!partnerId) {
+  if (!isAdmin && !partnerId) {
     return NextResponse.json(
       { error: 'Chưa đăng nhập' },
       { status: 401 }
@@ -40,7 +42,7 @@ export async function POST(
       );
     }
 
-    if (booking.partnerId !== partnerId) {
+    if (!isAdmin && booking.partnerId !== partnerId) {
       return NextResponse.json(
         { error: 'Không có quyền truy cập' },
         { status: 403 }
@@ -51,11 +53,10 @@ export async function POST(
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       'unknown';
 
-    // Audit log the reveal action
     await prisma.auditLog.create({
       data: {
-        actorType: 'partner',
-        actorId: partnerId,
+        actorType: isAdmin ? 'admin' : 'partner',
+        actorId: isAdmin ? 'admin' : partnerId!,
         action: 'reveal_pii',
         bookingId: id,
         ip,

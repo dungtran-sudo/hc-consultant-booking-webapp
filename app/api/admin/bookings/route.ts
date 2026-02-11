@@ -1,32 +1,42 @@
 import { NextResponse } from 'next/server';
-import { getSessionPartnerId, getPartnerName } from '@/lib/partner-auth';
 import { prisma } from '@/lib/db';
+import { validateAdminAuth } from '@/lib/admin-auth';
+import { getPartnerName } from '@/lib/partner-auth';
 
 export async function GET(request: Request) {
-  const partnerId = await getSessionPartnerId();
-
-  if (!partnerId) {
-    return NextResponse.json(
-      { error: 'Chưa đăng nhập' },
-      { status: 401 }
-    );
+  if (!validateAdminAuth(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const url = new URL(request.url);
   const page = Math.max(1, parseInt(url.searchParams.get('page') || '1'));
   const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get('limit') || '20')));
   const search = url.searchParams.get('search') || '';
+  const partner = url.searchParams.get('partner') || '';
   const status = url.searchParams.get('status') || '';
+  const from = url.searchParams.get('from') || '';
+  const to = url.searchParams.get('to') || '';
 
   try {
-    const where: Record<string, unknown> = { partnerId, isDeleted: false };
+    const where: Record<string, unknown> = { isDeleted: false };
 
     if (search) {
       where.bookingNumber = { contains: search, mode: 'insensitive' };
     }
 
+    if (partner) {
+      where.partnerId = partner;
+    }
+
     if (status) {
       where.status = status;
+    }
+
+    if (from || to) {
+      const createdAt: Record<string, Date> = {};
+      if (from) createdAt.gte = new Date(from);
+      if (to) createdAt.lte = new Date(to + 'T23:59:59.999Z');
+      where.createdAt = createdAt;
     }
 
     const [bookings, total] = await Promise.all([
@@ -40,6 +50,8 @@ export async function GET(request: Request) {
           bookingNumber: true,
           serviceName: true,
           specialty: true,
+          partnerId: true,
+          partnerName: true,
           branchAddress: true,
           preferredDate: true,
           preferredTime: true,
@@ -53,24 +65,10 @@ export async function GET(request: Request) {
       prisma.booking.count({ where }),
     ]);
 
-    const ip =
-      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      'unknown';
-
-    await prisma.auditLog.create({
-      data: {
-        actorType: 'partner',
-        actorId: partnerId,
-        action: 'view_booking_list',
-        metadata: JSON.stringify({ count: bookings.length, page }),
-        ip,
-      },
-    });
-
-    const partnerName = getPartnerName(partnerId);
     return NextResponse.json({
       bookings: bookings.map((b) => ({
         ...b,
+        partnerName: b.partnerName || getPartnerName(b.partnerId),
         createdAt: b.createdAt.toISOString(),
         confirmedAt: b.confirmedAt?.toISOString() || null,
         completedAt: b.completedAt?.toISOString() || null,
@@ -78,13 +76,9 @@ export async function GET(request: Request) {
       total,
       page,
       totalPages: Math.ceil(total / limit),
-      partnerName,
     });
   } catch (error) {
-    console.error('Error reading bookings:', error);
-    return NextResponse.json(
-      { error: 'Lỗi khi đọc dữ liệu' },
-      { status: 500 }
-    );
+    console.error('Admin bookings error:', error);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
