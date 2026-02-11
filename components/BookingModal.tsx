@@ -130,12 +130,15 @@ export default function BookingModal({
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error('Booking failed');
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Booking failed');
+      }
 
       setSuccess(true);
       setTimeout(onClose, 3000);
-    } catch {
-      setError('Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }

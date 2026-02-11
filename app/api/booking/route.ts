@@ -130,9 +130,10 @@ export async function POST(request: Request) {
       bookingNumber: booking.bookingNumber,
     });
   } catch (error) {
-    console.error('Booking API error:', error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('Booking API error:', msg, error);
     return NextResponse.json(
-      { error: 'Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.' },
+      { error: `Lỗi đặt lịch: ${msg}` },
       { status: 500 }
     );
   }
