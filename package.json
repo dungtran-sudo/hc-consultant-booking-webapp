@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "sync-partners": "npx tsx scripts/sync-partners.ts"
   },
   "dependencies": {
+    "dotenv": "^17.2.4",
     "googleapis": "^171.4.0",
     "next": "16.1.6",
     "nodemailer": "^8.0.1",

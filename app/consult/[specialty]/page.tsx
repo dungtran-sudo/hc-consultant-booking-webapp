@@ -48,9 +48,12 @@ export default function ConsultPage({
 
   const handleResult = (data: AnalysisResultType) => {
     setResult(data);
+    const effectiveCity = formData.khuVuc === 'Tỉnh khác' && formData.khuVucKhac?.trim()
+      ? formData.khuVucKhac.trim()
+      : formData.khuVuc;
     const filtered = filterPartners(
       data.recommendedSpecialties,
-      formData.khuVuc
+      effectiveCity
     );
     setPartners(filtered.slice(0, 5));
   };
@@ -68,7 +71,7 @@ export default function ConsultPage({
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Chuyên khoa không tồn tại
           </h1>
-          <Link href="/" className="text-teal-600 hover:underline">
+          <Link href="/" className="text-blue-600 hover:underline">
             Quay về trang chủ
           </Link>
         </div>
@@ -81,7 +84,7 @@ export default function ConsultPage({
       <main className="max-w-3xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-teal-600">
+          <Link href="/" className="hover:text-blue-600">
             Trang chủ
           </Link>
           <span className="mx-2">&gt;</span>
@@ -90,7 +93,6 @@ export default function ConsultPage({
 
         {/* Page title */}
         <h1 className="text-2xl font-bold text-gray-900 mb-6">
-          <span className="text-3xl mr-2">{specialty.icon}</span>
           {specialty.label} — Phiếu Thông Tin Bệnh Nhân
         </h1>
 
@@ -112,7 +114,7 @@ export default function ConsultPage({
             {/* Partner Cards */}
             <div className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
-                🏥 Đối tác đề xuất
+                Đối tác đề xuất
               </h2>
               {partners.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

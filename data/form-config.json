@@ -1,0 +1,62 @@
+{
+  "commonFields": [
+    { "id": "hoTen", "label": "Họ tên bệnh nhân", "type": "text", "required": true, "gridCol": 2 },
+    { "id": "tuoi", "label": "Tuổi", "type": "number", "required": true, "gridCol": 2 },
+    { "id": "gioiTinh", "label": "Giới tính", "type": "select", "required": true, "options": ["Nam", "Nữ", "Khác"], "gridCol": 2 },
+    { "id": "khuVuc", "label": "Khu vực sinh sống", "type": "select", "required": true, "options": ["Hà Nội", "TP.HCM", "Đà Nẵng", "Cần Thơ", "Tỉnh khác"], "gridCol": 2 },
+    { "id": "trieuChungChinh", "label": "Triệu chứng chính", "type": "textarea", "required": true, "placeholder": "Mô tả chi tiết triệu chứng...", "rows": 3 },
+    { "id": "thoiGianKhoiPhat", "label": "Thời gian khởi phát", "type": "select", "required": true, "options": ["Hôm nay", "2-3 ngày", "1 tuần", "2-4 tuần", "Hơn 1 tháng"], "gridCol": 2 },
+    { "id": "thuocDaDung", "label": "Thuốc đã dùng", "type": "textarea", "required": false, "placeholder": "Liệt kê thuốc đã tự dùng (nếu có)...", "rows": 2 }
+  ],
+  "specialtyFields": [
+    {
+      "specialtyId": "nhi",
+      "sectionTitle": "Thông tin Nhi khoa",
+      "fields": [
+        { "id": "canNang", "label": "Cân nặng của trẻ (kg)", "type": "number", "required": true, "step": "0.1", "gridCol": 2 },
+        { "id": "cheDoDan", "label": "Chế độ ăn", "type": "select", "required": true, "options": ["Bú mẹ hoàn toàn", "Bú mẹ + ăn dặm", "Ăn dặm", "Ăn cơm bình thường"], "gridCol": 2 },
+        { "id": "tienSuTiemChung", "label": "Tiền sử tiêm chủng", "type": "textarea", "required": false, "placeholder": "Đã tiêm đủ theo lịch TCMR? Còn thiếu mũi nào?", "rows": 2 },
+        { "id": "diNhaTre", "label": "Có đi nhà trẻ/mẫu giáo không?", "type": "select", "required": false, "options": ["Có", "Không"] }
+      ]
+    },
+    {
+      "specialtyId": "da-lieu",
+      "sectionTitle": "Thông tin Da liễu",
+      "fields": [
+        { "id": "viTriTonThuong", "label": "Vị trí tổn thương trên cơ thể", "type": "text", "required": true, "placeholder": "Ví dụ: mặt, cánh tay, lưng..." },
+        { "id": "hinhThaiTonThuong", "label": "Hình thái tổn thương", "type": "checkbox-group", "required": true, "options": ["Mẩn đỏ", "Mụn nước", "Vảy", "Ngứa", "Đau rát", "Loét", "Thay đổi màu da", "Khác"], "gridCol": 4 },
+        { "id": "tienSuDiUng", "label": "Tiền sử dị ứng", "type": "textarea", "required": false, "placeholder": "Dị ứng thuốc, thức ăn, hóa mỹ phẩm...", "rows": 2 },
+        { "id": "dungKemBoi", "label": "Đã dùng kem bôi nào chưa?", "type": "textarea", "required": false, "placeholder": "Tên kem bôi, thời gian dùng...", "rows": 2 }
+      ]
+    },
+    {
+      "specialtyId": "sinh-san",
+      "sectionTitle": "Thông tin Sinh sản",
+      "fields": [
+        { "id": "chuKyKinh", "label": "Chu kỳ kinh nguyệt", "type": "select", "required": false, "options": ["Đều (28-30 ngày)", "Không đều", "Vô kinh", "Không áp dụng (nam/chưa dậy thì)"], "gridCol": 2 },
+        { "id": "tinhTrangHonNhan", "label": "Tình trạng hôn nhân", "type": "select", "required": false, "options": ["Độc thân", "Đã kết hôn", "Đang tìm kiếm hỗ trợ sinh sản"], "gridCol": 2 },
+        { "id": "tienSuSanPhuKhoa", "label": "Tiền sử Sản Phụ khoa", "type": "textarea", "required": false, "placeholder": "Số lần sinh, sảy thai, phẫu thuật phụ khoa...", "rows": 2 },
+        { "id": "mucTieuKham", "label": "Mục tiêu khám", "type": "select", "required": true, "options": ["Thai sản", "Khám phụ khoa định kỳ", "Điều trị vô sinh - hiếm muộn", "Tư vấn kế hoạch hóa gia đình", "Khác"] }
+      ]
+    },
+    {
+      "specialtyId": "std-sti",
+      "sectionTitle": "Thông tin STD/STI",
+      "fields": [
+        { "id": "quanHeTinhDuc", "label": "Đã có quan hệ tình dục gần đây?", "type": "select", "required": true, "options": ["Có", "Không", "Không muốn cung cấp"] },
+        { "id": "trieuChungCuThe", "label": "Triệu chứng cụ thể", "type": "checkbox-group", "required": true, "options": ["Tiết dịch bất thường", "Đau/rát khi tiểu", "Loét/mụn bộ phận sinh dục", "Ngứa", "Phát ban", "Hạch bẹn sưng", "Không có triệu chứng (tầm soát)", "Khác"], "gridCol": 2 },
+        { "id": "xetNghiemGanNhat", "label": "Xét nghiệm STI gần nhất", "type": "textarea", "required": false, "placeholder": "Đã xét nghiệm gì? Khi nào? Kết quả?", "rows": 2 }
+      ]
+    },
+    {
+      "specialtyId": "tieu-hoa",
+      "sectionTitle": "Thông tin Tiêu hoá",
+      "fields": [
+        { "id": "viTriDauBung", "label": "Vị trí đau/khó chịu", "type": "select", "required": true, "options": ["Thượng vị (vùng dạ dày)", "Quanh rốn", "Hạ vị (dưới rốn)", "Hố chậu phải", "Hố chậu trái", "Lan toả toàn bụng", "Không đau bụng"] },
+        { "id": "tinhChatPhan", "label": "Tính chất phân", "type": "checkbox-group", "required": false, "options": ["Phân bình thường", "Tiêu chảy", "Táo bón", "Phân có máu", "Phân đen", "Phân nhầy", "Phân màu bất thường"], "gridCol": 3 },
+        { "id": "cheDoDanUong", "label": "Chế độ ăn uống", "type": "textarea", "required": false, "placeholder": "Thói quen ăn uống, thực phẩm gần đây...", "rows": 2 },
+        { "id": "tienSuTieuHoa", "label": "Tiền sử bệnh tiêu hóa", "type": "textarea", "required": false, "placeholder": "Đau dạ dày, viêm đại tràng, phẫu thuật bụng...", "rows": 2 }
+      ]
+    }
+  ]
+}

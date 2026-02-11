@@ -1,5 +1,5 @@
 import { FormData } from '../types';
-import { layer4 } from './shared';
+import { layer4, getEffectiveKhuVuc, buildExtraFields } from './shared';
 
 const LAYER_1 = `Hãy đóng vai bác sĩ chuyên khoa Nhi có 20 năm kinh nghiệm tại Việt Nam, từng công tác tại Bệnh viện Nhi Trung ương Hà Nội và Bệnh viện Nhi Đồng 1/2 TP.HCM. Sử dụng kiến thức từ: Phác đồ điều trị Nhi khoa của Bộ Y tế Việt Nam, hướng dẫn của WHO về chăm sóc sức khỏe trẻ em, tài liệu từ Nelson Textbook of Pediatrics, và kinh nghiệm lâm sàng điều trị tại Việt Nam.`;
 
@@ -14,14 +14,14 @@ function buildLayer3(formData: FormData): string {
 - Họ tên: ${formData.hoTen}
 - Tuổi: ${formData.tuoi}
 - Giới tính: ${formData.gioiTinh}
-- Khu vực: ${formData.khuVuc}
+- Khu vực: ${getEffectiveKhuVuc(formData)}
 - Cân nặng: ${formData.canNang || 'Không cung cấp'}
 - Chế độ ăn: ${formData.cheDoDan || 'Không cung cấp'}
 - Tiền sử tiêm chủng: ${formData.tienSuTiemChung || 'Không cung cấp'}
 - Đi nhà trẻ/mẫu giáo: ${formData.diNhaTre || 'Không cung cấp'}
 - Triệu chứng chính: ${formData.trieuChungChinh}
 - Thời gian khởi phát: ${formData.thoiGianKhoiPhat}
-- Thuốc đã dùng: ${formData.thuocDaDung || 'Không có'}`;
+- Thuốc đã dùng: ${formData.thuocDaDung || 'Không có'}${buildExtraFields(formData, ['hoTen', 'tuoi', 'gioiTinh', 'khuVuc', 'khuVucKhac', 'trieuChungChinh', 'thoiGianKhoiPhat', 'thuocDaDung', 'canNang', 'cheDoDan', 'tienSuTiemChung', 'diNhaTre'])}`;
 }
 
 export function buildNhiPrompt(formData: FormData): string {

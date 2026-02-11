@@ -45,6 +45,7 @@ export interface FormData {
   tuoi: string;
   gioiTinh: string;
   khuVuc: string;
+  khuVucKhac?: string;
   trieuChungChinh: string;
   thoiGianKhoiPhat: string;
   thuocDaDung: string;
@@ -72,6 +73,31 @@ export interface FormData {
   tinhChatPhan?: string;
   cheDoDanUong?: string;
   tienSuTieuHoa?: string;
+  // Dynamic fields from config
+  [key: string]: string | undefined;
+}
+
+export interface FieldConfig {
+  id: string;
+  label: string;
+  type: 'text' | 'number' | 'select' | 'textarea' | 'checkbox-group';
+  required: boolean;
+  placeholder?: string;
+  options?: string[];
+  rows?: number;
+  step?: string;
+  gridCol?: number;
+}
+
+export interface SpecialtyFieldGroup {
+  specialtyId: string;
+  sectionTitle: string;
+  fields: FieldConfig[];
+}
+
+export interface FormConfig {
+  commonFields: FieldConfig[];
+  specialtyFields: SpecialtyFieldGroup[];
 }
 
 export interface AnalysisResult {

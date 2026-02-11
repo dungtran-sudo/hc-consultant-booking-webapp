@@ -1,5 +1,5 @@
 import { FormData } from '../types';
-import { layer4 } from './shared';
+import { layer4, getEffectiveKhuVuc, buildExtraFields } from './shared';
 
 const LAYER_1 = `Hãy đóng vai bác sĩ chuyên khoa Tiêu hóa có 20 năm kinh nghiệm tại Việt Nam, từng công tác tại Bệnh viện Đại học Y Dược TP.HCM và Bệnh viện Bạch Mai Hà Nội. Sử dụng kiến thức từ: Phác đồ điều trị Tiêu hóa của Bộ Y tế Việt Nam, hướng dẫn của ACG (American College of Gastroenterology), BSG (British Society of Gastroenterology), và kinh nghiệm điều trị bệnh tiêu hóa tại Việt Nam.`;
 
@@ -14,14 +14,14 @@ function buildLayer3(formData: FormData): string {
 - Họ tên: ${formData.hoTen}
 - Tuổi: ${formData.tuoi}
 - Giới tính: ${formData.gioiTinh}
-- Khu vực: ${formData.khuVuc}
+- Khu vực: ${getEffectiveKhuVuc(formData)}
 - Vị trí đau/khó chịu: ${formData.viTriDauBung || 'Không cung cấp'}
 - Tính chất phân: ${formData.tinhChatPhan || 'Không cung cấp'}
 - Chế độ ăn uống: ${formData.cheDoDanUong || 'Không cung cấp'}
 - Tiền sử bệnh tiêu hóa: ${formData.tienSuTieuHoa || 'Không cung cấp'}
 - Triệu chứng chính: ${formData.trieuChungChinh}
 - Thời gian khởi phát: ${formData.thoiGianKhoiPhat}
-- Thuốc đã dùng: ${formData.thuocDaDung || 'Không có'}`;
+- Thuốc đã dùng: ${formData.thuocDaDung || 'Không có'}${buildExtraFields(formData, ['hoTen', 'tuoi', 'gioiTinh', 'khuVuc', 'khuVucKhac', 'trieuChungChinh', 'thoiGianKhoiPhat', 'thuocDaDung', 'viTriDauBung', 'tinhChatPhan', 'cheDoDanUong', 'tienSuTieuHoa'])}`;
 }
 
 export function buildTieuHoaPrompt(formData: FormData): string {

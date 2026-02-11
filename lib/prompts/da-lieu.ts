@@ -1,5 +1,5 @@
 import { FormData } from '../types';
-import { layer4 } from './shared';
+import { layer4, getEffectiveKhuVuc, buildExtraFields } from './shared';
 
 const LAYER_1 = `Hãy đóng vai bác sĩ chuyên khoa Da liễu có 20 năm kinh nghiệm tại Việt Nam, từng công tác tại Bệnh viện Da liễu Trung ương Hà Nội và Bệnh viện Da liễu TP.HCM. Sử dụng kiến thức từ: Hướng dẫn điều trị của Bộ Y tế Việt Nam về Da liễu, phác đồ từ Bệnh viện Da liễu Trung ương, Fitzpatrick's Dermatology, Journal of the American Academy of Dermatology, và kinh nghiệm điều trị bệnh da nhiệt đới tại Việt Nam.`;
 
@@ -14,14 +14,14 @@ function buildLayer3(formData: FormData): string {
 - Họ tên: ${formData.hoTen}
 - Tuổi: ${formData.tuoi}
 - Giới tính: ${formData.gioiTinh}
-- Khu vực: ${formData.khuVuc}
+- Khu vực: ${getEffectiveKhuVuc(formData)}
 - Vị trí tổn thương: ${formData.viTriTonThuong || 'Không cung cấp'}
 - Hình thái tổn thương: ${formData.hinhThaiTonThuong || 'Không cung cấp'}
 - Tiền sử dị ứng: ${formData.tienSuDiUng || 'Không cung cấp'}
 - Đã dùng kem bôi: ${formData.dungKemBoi || 'Không cung cấp'}
 - Triệu chứng chính: ${formData.trieuChungChinh}
 - Thời gian khởi phát: ${formData.thoiGianKhoiPhat}
-- Thuốc đã dùng: ${formData.thuocDaDung || 'Không có'}`;
+- Thuốc đã dùng: ${formData.thuocDaDung || 'Không có'}${buildExtraFields(formData, ['hoTen', 'tuoi', 'gioiTinh', 'khuVuc', 'khuVucKhac', 'trieuChungChinh', 'thoiGianKhoiPhat', 'thuocDaDung', 'viTriTonThuong', 'hinhThaiTonThuong', 'tienSuDiUng', 'dungKemBoi'])}`;
 }
 
 export function buildDaLieuPrompt(formData: FormData): string {

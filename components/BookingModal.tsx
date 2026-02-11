@@ -87,15 +87,14 @@ export default function BookingModal({
     }
   };
 
-  const inputClass = 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none text-sm';
+  const inputClass = 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm';
   const labelClass = 'block text-sm font-medium text-gray-700 mb-1';
 
   if (success) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl p-8 max-w-md w-full text-center">
-          <div className="text-4xl mb-4">✅</div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Đặt lịch thành công!</h3>
+          <h3 className="text-lg font-bold text-blue-700 mb-2">Đặt lịch thành công!</h3>
           <p className="text-gray-600">Đối tác sẽ liên hệ xác nhận trong vòng 24 giờ.</p>
         </div>
       </div>
@@ -175,7 +174,7 @@ export default function BookingModal({
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-teal-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-teal-700 transition-colors disabled:opacity-50"
+            className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
             {loading ? 'Đang xử lý...' : 'Xác nhận đặt lịch'}
           </button>

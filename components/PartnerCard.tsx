@@ -25,7 +25,7 @@ export default function PartnerCard({ partner, recommendedSpecialties, onBooking
 
       <div className="flex flex-wrap gap-3 mb-3 text-sm">
         {partner.phone && (
-          <a href={`tel:${partner.phone}`} className="text-teal-600 hover:underline">
+          <a href={`tel:${partner.phone}`} className="text-blue-600 hover:underline">
             {partner.phone}
           </a>
         )}
@@ -60,7 +60,7 @@ export default function PartnerCard({ partner, recommendedSpecialties, onBooking
 
       <button
         onClick={() => onBooking(partner, relevantServices[0])}
-        className="w-full bg-teal-600 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-teal-700 transition-colors"
+        className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
       >
         Đặt lịch ngay &rarr;
       </button>

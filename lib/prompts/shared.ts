@@ -1,3 +1,20 @@
+import { FormData } from '../types';
+
+export function getEffectiveKhuVuc(formData: FormData): string {
+  if (formData.khuVuc === 'Tỉnh khác' && formData.khuVucKhac?.trim()) {
+    return formData.khuVucKhac.trim();
+  }
+  return formData.khuVuc;
+}
+
+export function buildExtraFields(formData: FormData, knownFields: string[]): string {
+  const extra = Object.entries(formData)
+    .filter(([key, val]) => !knownFields.includes(key) && val?.trim())
+    .map(([key, val]) => `- ${key}: ${val}`)
+    .join('\n');
+  return extra ? `\n${extra}` : '';
+}
+
 export function layer4(): string {
   return `[YÊU CẦU PHÂN TÍCH VÀ ĐỊNH DẠNG ĐẦU RA]
 
@@ -15,14 +32,17 @@ Hãy phân tích và trả lời CHÍNH XÁC theo cấu trúc dưới đây. S�
 ## P — Kế hoạch xử trí (Plan)
 [Xét nghiệm cần làm, chuyên khoa cần gặp, hướng điều trị ban đầu, theo dõi tại nhà]
 
-## ⚠️ Dấu hiệu đỏ — Cần đến cấp cứu ngay
+## Dấu hiệu đỏ — Cần đến cấp cứu ngay
 [Liệt kê bullet point các dấu hiệu nguy hiểm cần nhập viện cấp cứu ngay]
 
-## 💊 Lưu ý thuốc
+## Lưu ý thuốc
 [Đánh giá các thuốc bệnh nhân đã tự dùng. Cảnh báo nếu có dấu hiệu lạm dụng kháng sinh, corticoid, hay thuốc không phù hợp]
 
-## 🏥 Chuyên khoa đề xuất đặt lịch
+## Chuyên khoa đề xuất đặt lịch
 [Ghi rõ chuyên khoa ưu tiên khám theo mã: nhi / da-lieu / sinh-san / std-sti / tieu-hoa]
+
+## Bệnh viện/phòng khám công lập gợi ý
+[Dựa trên khu vực sinh sống của bệnh nhân, đề xuất 2-3 bệnh viện hoặc phòng khám công lập phù hợp với chuyên khoa cần khám. Ghi rõ tên, địa chỉ, và lý do đề xuất.]
 
 ---
 DISCLAIMER: Đây là thông tin tham khảo từ AI, không thay thế cho việc khám và chẩn đoán trực tiếp từ bác sĩ. Vui lòng ưu tiên thăm khám trực tiếp tại cơ sở y tế phù hợp.

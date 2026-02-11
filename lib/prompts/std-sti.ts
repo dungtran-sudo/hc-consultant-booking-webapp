@@ -1,5 +1,5 @@
 import { FormData } from '../types';
-import { layer4 } from './shared';
+import { layer4, getEffectiveKhuVuc, buildExtraFields } from './shared';
 
 const LAYER_1 = `Hãy đóng vai bác sĩ chuyên khoa Da liễu - Hoa liễu và Bệnh Lây truyền qua đường tình dục có 20 năm kinh nghiệm tại Việt Nam, từng công tác tại Bệnh viện Da liễu Trung ương và Bệnh viện Bệnh Nhiệt đới. Sử dụng kiến thức từ: Hướng dẫn điều trị STI của Bộ Y tế Việt Nam, hướng dẫn của CDC và WHO về STD, và kinh nghiệm điều trị tại Việt Nam. Lưu ý: Đây là chủ đề nhạy cảm, hãy tiếp cận không phán xét, bảo mật và tôn trọng người bệnh.`;
 
@@ -14,13 +14,13 @@ function buildLayer3(formData: FormData): string {
 - Họ tên: ${formData.hoTen}
 - Tuổi: ${formData.tuoi}
 - Giới tính: ${formData.gioiTinh}
-- Khu vực: ${formData.khuVuc}
+- Khu vực: ${getEffectiveKhuVuc(formData)}
 - Quan hệ tình dục gần đây: ${formData.quanHeTinhDuc || 'Không cung cấp'}
 - Triệu chứng cụ thể: ${formData.trieuChungCuThe || 'Không cung cấp'}
 - Xét nghiệm STI gần nhất: ${formData.xetNghiemGanNhat || 'Không cung cấp'}
 - Triệu chứng chính: ${formData.trieuChungChinh}
 - Thời gian khởi phát: ${formData.thoiGianKhoiPhat}
-- Thuốc đã dùng: ${formData.thuocDaDung || 'Không có'}`;
+- Thuốc đã dùng: ${formData.thuocDaDung || 'Không có'}${buildExtraFields(formData, ['hoTen', 'tuoi', 'gioiTinh', 'khuVuc', 'khuVucKhac', 'trieuChungChinh', 'thoiGianKhoiPhat', 'thuocDaDung', 'quanHeTinhDuc', 'trieuChungCuThe', 'xetNghiemGanNhat'])}`;
 }
 
 export function buildStdStiPrompt(formData: FormData): string {

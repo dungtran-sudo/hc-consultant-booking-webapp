@@ -14,7 +14,7 @@ function renderContent(content: string) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    if (line.startsWith('## ⚠️') || line.startsWith('## ⚠')) {
+    if (line.startsWith('## ') && line.includes('Dấu hiệu đỏ')) {
       currentSection = 'red-flags';
       elements.push(
         <div key={i} className="mt-6 mb-2 bg-red-50 border-l-4 border-red-500 p-3">
@@ -24,7 +24,7 @@ function renderContent(content: string) {
       continue;
     }
 
-    if (line.startsWith('## 💊')) {
+    if (line.startsWith('## ') && line.includes('Lưu ý thuốc')) {
       currentSection = 'medication';
       elements.push(
         <div key={i} className="mt-6 mb-2 bg-amber-50 border-l-4 border-amber-500 p-3">
@@ -34,11 +34,21 @@ function renderContent(content: string) {
       continue;
     }
 
-    if (line.startsWith('## 🏥')) {
+    if (line.startsWith('## ') && line.includes('Chuyên khoa đề xuất')) {
       currentSection = 'specialty';
       elements.push(
-        <div key={i} className="mt-6 mb-2 bg-teal-50 border-l-4 border-teal-500 p-3">
-          <h3 className="text-lg font-bold text-teal-700">{line.replace(/^##\s*/, '')}</h3>
+        <div key={i} className="mt-6 mb-2 bg-blue-50 border-l-4 border-blue-500 p-3">
+          <h3 className="text-lg font-bold text-blue-700">{line.replace(/^##\s*/, '')}</h3>
+        </div>
+      );
+      continue;
+    }
+
+    if (line.startsWith('## ') && line.includes('Bệnh viện') && line.includes('công lập')) {
+      currentSection = 'public-hospital';
+      elements.push(
+        <div key={i} className="mt-6 mb-2 bg-blue-50 border-l-4 border-blue-400 p-3">
+          <h3 className="text-lg font-bold text-blue-700">{line.replace(/^##\s*/, '')}</h3>
         </div>
       );
       continue;
@@ -76,7 +86,9 @@ function renderContent(content: string) {
         : currentSection === 'medication'
         ? 'text-amber-700 bg-amber-50 px-3 py-1'
         : currentSection === 'specialty'
-        ? 'text-teal-700 bg-teal-50 px-3 py-1'
+        ? 'text-blue-700 bg-blue-50 px-3 py-1'
+        : currentSection === 'public-hospital'
+        ? 'text-blue-700 bg-blue-50 px-3 py-1'
         : 'text-gray-700';
 
     elements.push(
@@ -95,7 +107,7 @@ export default function AnalysisResult({ result }: AnalysisResultProps) {
       <h2 className="text-xl font-bold text-gray-900 mb-4">Kết quả phân tích lâm sàng</h2>
       <div className="prose max-w-none">{renderContent(result.displayContent)}</div>
       <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
-        <strong>⚠️ Lưu ý:</strong> Đây là thông tin tham khảo từ AI, không thay thế cho việc khám và chẩn đoán trực tiếp từ bác sĩ.
+        <strong>Lưu ý:</strong> Đây là thông tin tham khảo từ AI, không thay thế cho việc khám và chẩn đoán trực tiếp từ bác sĩ.
       </div>
     </div>
   );

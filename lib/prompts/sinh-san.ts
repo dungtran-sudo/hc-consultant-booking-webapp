@@ -1,5 +1,5 @@
 import { FormData } from '../types';
-import { layer4 } from './shared';
+import { layer4, getEffectiveKhuVuc, buildExtraFields } from './shared';
 
 const LAYER_1 = `Hãy đóng vai bác sĩ chuyên khoa Sản Phụ khoa và Hỗ trợ sinh sản có 20 năm kinh nghiệm tại Việt Nam, từng công tác tại Bệnh viện Từ Dũ TP.HCM và Bệnh viện Phụ sản Trung ương Hà Nội. Sử dụng kiến thức từ: Phác đồ điều trị Sản Phụ khoa của Bộ Y tế Việt Nam, hướng dẫn của WHO và FIGO về sức khỏe sinh sản, Williams Obstetrics, và kinh nghiệm điều trị hiếm muộn vô sinh tại Việt Nam.`;
 
@@ -14,14 +14,14 @@ function buildLayer3(formData: FormData): string {
 - Họ tên: ${formData.hoTen}
 - Tuổi: ${formData.tuoi}
 - Giới tính: ${formData.gioiTinh}
-- Khu vực: ${formData.khuVuc}
+- Khu vực: ${getEffectiveKhuVuc(formData)}
 - Chu kỳ kinh nguyệt: ${formData.chuKyKinh || 'Không cung cấp'}
 - Tiền sử Sản Phụ khoa: ${formData.tienSuSanPhuKhoa || 'Không cung cấp'}
 - Tình trạng hôn nhân: ${formData.tinhTrangHonNhan || 'Không cung cấp'}
 - Mục tiêu khám: ${formData.mucTieuKham || 'Không cung cấp'}
 - Triệu chứng chính: ${formData.trieuChungChinh}
 - Thời gian khởi phát: ${formData.thoiGianKhoiPhat}
-- Thuốc đã dùng: ${formData.thuocDaDung || 'Không có'}`;
+- Thuốc đã dùng: ${formData.thuocDaDung || 'Không có'}${buildExtraFields(formData, ['hoTen', 'tuoi', 'gioiTinh', 'khuVuc', 'khuVucKhac', 'trieuChungChinh', 'thoiGianKhoiPhat', 'thuocDaDung', 'chuKyKinh', 'tienSuSanPhuKhoa', 'tinhTrangHonNhan', 'mucTieuKham'])}`;
 }
 
 export function buildSinhSanPrompt(formData: FormData): string {
