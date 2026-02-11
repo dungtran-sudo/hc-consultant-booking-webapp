@@ -7,7 +7,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import PIIConsentGate from '@/components/PIIConsentGate';
 import { MaskedBooking, RevealedPII } from '@/lib/types';
 
-const STATUS_TABS = [
+const STATUS_OPTIONS = [
   { value: '', label: 'Tất cả' },
   { value: 'pending', label: 'Chờ xử lý' },
   { value: 'confirmed', label: 'Đã xác nhận' },
@@ -28,6 +28,13 @@ const STATUS_COLORS: Record<string, string> = {
   completed: 'bg-green-100 text-green-800',
   cancelled: 'bg-gray-100 text-gray-600',
 };
+
+const STAT_CARDS = [
+  { key: '', label: 'Tổng cộng', color: 'bg-white border-gray-200 text-gray-900', iconBg: 'bg-gray-100' },
+  { key: 'pending', label: 'Chờ xử lý', color: 'bg-white border-yellow-200 text-yellow-800', iconBg: 'bg-yellow-100' },
+  { key: 'confirmed', label: 'Đã xác nhận', color: 'bg-white border-blue-200 text-blue-800', iconBg: 'bg-blue-100' },
+  { key: 'completed', label: 'Hoàn thành', color: 'bg-white border-green-200 text-green-800', iconBg: 'bg-green-100' },
+];
 
 function formatDate(iso: string): string {
   if (!iso) return '';
@@ -53,6 +60,7 @@ export default function PartnerDashboardPage() {
   const [revealedPII, setRevealedPII] = useState<Record<string, RevealedPII | null>>({});
   const [revealingId, setRevealingId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<{
     bookingId: string;
     bookingNumber: string;
@@ -68,6 +76,11 @@ export default function PartnerDashboardPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({
+    pending: 0, confirmed: 0, completed: 0, cancelled: 0,
+  });
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
@@ -75,6 +88,8 @@ export default function PartnerDashboardPage() {
     const params = new URLSearchParams({ page: String(page), limit: '20' });
     if (statusFilter) params.set('status', statusFilter);
     if (search) params.set('search', search);
+    if (dateFrom) params.set('dateFrom', dateFrom);
+    if (dateTo) params.set('dateTo', dateTo);
 
     try {
       const r = await fetch(`/api/partner/bookings?${params}`);
@@ -87,22 +102,34 @@ export default function PartnerDashboardPage() {
       setPartnerName(data.partnerName || '');
       setTotal(data.total || 0);
       setTotalPages(data.totalPages || 1);
+      if (data.statusCounts) setStatusCounts(data.statusCounts);
     } catch {
       setError('Lỗi khi tải dữ liệu');
     } finally {
       setLoading(false);
     }
-  }, [router, page, statusFilter, search]);
+  }, [router, page, statusFilter, search, dateFrom, dateTo]);
 
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
     setSearch(searchInput);
     setPage(1);
   };
+
+  const clearFilters = () => {
+    setSearchInput('');
+    setSearch('');
+    setStatusFilter('');
+    setDateFrom('');
+    setDateTo('');
+    setPage(1);
+  };
+
+  const hasFilters = search || statusFilter || dateFrom || dateTo;
 
   const requestReveal = (bookingId: string) => {
     if (revealedPII[bookingId] !== undefined) return;
@@ -156,6 +183,8 @@ export default function PartnerDashboardPage() {
         setBookings((prev) =>
           prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b))
         );
+        // Refresh to update counts
+        fetchBookings();
       }
     } catch {
       setError('Lỗi khi cập nhật');
@@ -169,10 +198,12 @@ export default function PartnerDashboardPage() {
     router.push('/partner/login');
   };
 
+  const totalBookings = statusCounts.pending + statusCounts.confirmed + statusCounts.completed + statusCounts.cancelled;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-blue-600 text-white px-6 py-4">
-        <div className="max-w-5xl mx-auto flex justify-between items-center">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div>
             <h1 className="text-lg font-bold">HelloBacsi Booking - Portal Đối Tác</h1>
             {partnerName && (
@@ -188,60 +219,97 @@ export default function PartnerDashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-6">
-        {/* Search */}
-        <form onSubmit={handleSearch} className="mb-4">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Tìm theo mã đặt lịch (#)..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-            >
-              Tìm
-            </button>
-            {search && (
+      <main className="max-w-6xl mx-auto px-4 py-6 space-y-4">
+        {/* Stat cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {STAT_CARDS.map((card) => {
+            const count = card.key ? (statusCounts[card.key] || 0) : totalBookings;
+            const isActive = statusFilter === card.key;
+            return (
               <button
-                type="button"
-                onClick={() => { setSearchInput(''); setSearch(''); setPage(1); }}
-                className="px-3 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm hover:bg-gray-300 transition-colors"
+                key={card.key}
+                onClick={() => { setStatusFilter(card.key); setPage(1); }}
+                className={`rounded-xl border p-4 text-left transition-all ${card.color} ${
+                  isActive ? 'ring-2 ring-blue-500 shadow-md' : 'hover:shadow-sm'
+                }`}
               >
-                Xóa
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{card.label}</p>
+                <p className="text-2xl font-bold mt-1">{count}</p>
               </button>
-            )}
-          </div>
-        </form>
-
-        {/* Status tabs */}
-        <div className="flex flex-wrap gap-1 mb-4">
-          {STATUS_TABS.map((tab) => (
-            <button
-              key={tab.value}
-              onClick={() => { setStatusFilter(tab.value); setPage(1); }}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                statusFilter === tab.value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Results count */}
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-gray-900">
-            Danh sách đặt lịch
-          </h2>
+        {/* Filter bar */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <form onSubmit={handleFilter} className="flex flex-wrap gap-3 items-end">
+            <div className="flex-1 min-w-[160px]">
+              <label className="block text-xs font-medium text-gray-500 mb-1">Tìm kiếm</label>
+              <input
+                type="text"
+                placeholder="Mã đặt lịch..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+            </div>
+            <div className="min-w-[140px]">
+              <label className="block text-xs font-medium text-gray-500 mb-1">Trạng thái</label>
+              <select
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                value={statusFilter}
+                onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+              >
+                {STATUS_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="min-w-[140px]">
+              <label className="block text-xs font-medium text-gray-500 mb-1">Từ ngày</label>
+              <input
+                type="date"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+              />
+            </div>
+            <div className="min-w-[140px]">
+              <label className="block text-xs font-medium text-gray-500 mb-1">Đến ngày</label>
+              <input
+                type="date"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              >
+                Lọc
+              </button>
+              {hasFilters && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="px-3 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm hover:bg-gray-300 transition-colors"
+                >
+                  Xóa bộ lọc
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+
+        {/* Results header */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-gray-900">Danh sách đặt lịch</h2>
           <span className="text-sm text-gray-500">{total} kết quả</span>
         </div>
 
+        {/* Table */}
         {loading ? (
           <LoadingSpinner message="Đang tải dữ liệu..." />
         ) : error ? (
@@ -249,161 +317,163 @@ export default function PartnerDashboardPage() {
             {error}
           </div>
         ) : bookings.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-            <p className="text-gray-500">Chưa có đặt lịch nào</p>
+          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
+            Chưa có đặt lịch nào
           </div>
         ) : (
-          <div className="space-y-3">
-            {bookings.map((b) => {
-              const revealed = revealedPII[b.id];
-              const isRevealed = b.id in revealedPII;
-              const isRevealing = revealingId === b.id;
-              const isDeleted = isRevealed && revealed === null;
-              const isUpdating = updatingId === b.id;
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="px-4 py-3 text-left font-medium text-gray-600">Mã</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-600">Dịch vụ</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-600 hidden md:table-cell">Địa chỉ</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-600 hidden sm:table-cell">Ngày khám</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-600 hidden sm:table-cell">Giờ</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-600 hidden lg:table-cell">Người tạo</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-600">Trạng thái</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-600">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {bookings.map((b) => {
+                    const isExpanded = expandedId === b.id;
+                    const revealed = revealedPII[b.id];
+                    const isRevealed = b.id in revealedPII;
+                    const isDeleted = isRevealed && revealed === null;
+                    const isUpdating = updatingId === b.id;
 
-              return (
-                <div
-                  key={b.id}
-                  className="bg-white rounded-xl border border-gray-200 overflow-hidden"
-                >
-                  {/* Main row */}
-                  <div className="px-4 py-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-mono text-blue-600 font-semibold">
-                            #{b.bookingNumber}
-                          </span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[b.status] || STATUS_COLORS.pending}`}>
-                            {STATUS_LABELS[b.status] || b.status}
-                          </span>
-                        </div>
-                        <p className="text-sm font-medium text-gray-900 mt-1 truncate">
-                          {b.serviceName}
-                        </p>
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-gray-500">
-                          <span>{b.branchAddress}</span>
-                          <span>{b.preferredDate} {b.preferredTime}</span>
-                          {b.bookedByStaffName && (
-                            <span>Người tạo: {b.bookedByStaffName}</span>
-                          )}
-                          <span className="hidden sm:inline">{formatDate(b.createdAt)}</span>
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex flex-col gap-1.5 items-end shrink-0">
-                        <button
-                          onClick={() => requestReveal(b.id)}
-                          disabled={isRevealed || isRevealing}
-                          className={`text-xs px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors ${
-                            isDeleted
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : isRevealed
-                                ? 'bg-green-50 text-green-700 cursor-default'
-                                : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
-                          }`}
-                        >
-                          {isRevealing
-                            ? 'Đang tải...'
-                            : isDeleted
-                              ? 'Đã xóa'
-                              : isRevealed
-                                ? 'Đã xem'
-                                : 'Xem chi tiết'}
-                        </button>
-
-                        {/* Status actions */}
-                        {b.status === 'pending' && (
-                          <div className="flex gap-1">
-                            <button
-                              onClick={() => setPendingAction({ bookingId: b.id, bookingNumber: b.bookingNumber, newStatus: 'confirmed' })}
-                              disabled={isUpdating}
-                              className="text-xs px-2 py-1 rounded bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors disabled:opacity-50"
-                            >
-                              Xác nhận
-                            </button>
-                            <button
-                              onClick={() => setPendingAction({ bookingId: b.id, bookingNumber: b.bookingNumber, newStatus: 'cancelled' })}
-                              disabled={isUpdating}
-                              className="text-xs px-2 py-1 rounded bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-50"
-                            >
-                              Hủy
-                            </button>
-                          </div>
-                        )}
-                        {b.status === 'confirmed' && (
-                          <div className="flex gap-1">
-                            <button
-                              onClick={() => setPendingAction({ bookingId: b.id, bookingNumber: b.bookingNumber, newStatus: 'completed' })}
-                              disabled={isUpdating}
-                              className="text-xs px-2 py-1 rounded bg-green-50 text-green-600 hover:bg-green-100 transition-colors disabled:opacity-50"
-                            >
-                              Hoàn thành
-                            </button>
-                            <button
-                              onClick={() => setPendingAction({ bookingId: b.id, bookingNumber: b.bookingNumber, newStatus: 'cancelled' })}
-                              disabled={isUpdating}
-                              className="text-xs px-2 py-1 rounded bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-50"
-                            >
-                              Hủy
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Revealed PII */}
-                  {isRevealed && revealed && (
-                    <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                        <div>
-                          <span className="text-gray-500">Bệnh nhân: </span>
-                          <span className="font-medium text-gray-900">
-                            {revealed.patientName}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">SDT: </span>
-                          <span className="font-medium text-gray-900">
-                            {revealed.phone}
-                          </span>
-                        </div>
-                        <div className="sm:col-span-2">
-                          <span className="text-gray-500">Tình trạng: </span>
-                          <span className="text-gray-700">
-                            {revealed.conditionSummary}
-                          </span>
-                        </div>
-                        {revealed.notes && (
-                          <div className="sm:col-span-2">
-                            <span className="text-gray-500">Ghi chú: </span>
-                            <span className="text-gray-700">
-                              {revealed.notes}
+                    return (
+                      <>
+                        <tr key={b.id} className={`hover:bg-gray-50 ${isExpanded ? 'bg-blue-50/30' : ''}`}>
+                          <td className="px-4 py-3 font-mono text-blue-600 font-semibold text-xs whitespace-nowrap">
+                            {b.bookingNumber}
+                          </td>
+                          <td className="px-4 py-3 text-gray-900 max-w-[180px] truncate">
+                            {b.serviceName}
+                          </td>
+                          <td className="px-4 py-3 text-gray-600 max-w-[160px] truncate hidden md:table-cell">
+                            {b.branchAddress}
+                          </td>
+                          <td className="px-4 py-3 text-gray-600 whitespace-nowrap hidden sm:table-cell">
+                            {b.preferredDate}
+                          </td>
+                          <td className="px-4 py-3 text-gray-600 whitespace-nowrap hidden sm:table-cell">
+                            {b.preferredTime}
+                          </td>
+                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap hidden lg:table-cell">
+                            {b.bookedByStaffName || '—'}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[b.status] || STATUS_COLORS.pending}`}>
+                              {STATUS_LABELS[b.status] || b.status}
                             </span>
-                          </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <button
+                                onClick={() => {
+                                  setExpandedId(isExpanded ? null : b.id);
+                                  if (!isExpanded && !isRevealed) requestReveal(b.id);
+                                }}
+                                disabled={revealingId === b.id}
+                                className={`text-xs px-2.5 py-1 rounded-lg whitespace-nowrap transition-colors ${
+                                  isDeleted
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : isExpanded
+                                      ? 'bg-blue-100 text-blue-700'
+                                      : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                                }`}
+                              >
+                                {revealingId === b.id
+                                  ? '...'
+                                  : isExpanded
+                                    ? 'Ẩn'
+                                    : 'Xem'}
+                              </button>
+                              {b.status === 'pending' && (
+                                <>
+                                  <button
+                                    onClick={() => setPendingAction({ bookingId: b.id, bookingNumber: b.bookingNumber, newStatus: 'confirmed' })}
+                                    disabled={isUpdating}
+                                    className="text-xs px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors disabled:opacity-50 whitespace-nowrap"
+                                  >
+                                    Xác nhận
+                                  </button>
+                                  <button
+                                    onClick={() => setPendingAction({ bookingId: b.id, bookingNumber: b.bookingNumber, newStatus: 'cancelled' })}
+                                    disabled={isUpdating}
+                                    className="text-xs px-2.5 py-1 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-50 whitespace-nowrap"
+                                  >
+                                    Hủy
+                                  </button>
+                                </>
+                              )}
+                              {b.status === 'confirmed' && (
+                                <>
+                                  <button
+                                    onClick={() => setPendingAction({ bookingId: b.id, bookingNumber: b.bookingNumber, newStatus: 'completed' })}
+                                    disabled={isUpdating}
+                                    className="text-xs px-2.5 py-1 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors disabled:opacity-50 whitespace-nowrap"
+                                  >
+                                    Hoàn thành
+                                  </button>
+                                  <button
+                                    onClick={() => setPendingAction({ bookingId: b.id, bookingNumber: b.bookingNumber, newStatus: 'cancelled' })}
+                                    disabled={isUpdating}
+                                    className="text-xs px-2.5 py-1 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-50 whitespace-nowrap"
+                                  >
+                                    Hủy
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                        {/* Expanded PII row */}
+                        {isExpanded && isRevealed && (
+                          <tr key={`${b.id}-pii`}>
+                            <td colSpan={8} className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                              {isDeleted ? (
+                                <p className="text-sm text-gray-400">Dữ liệu đã được xóa theo yêu cầu của bệnh nhân.</p>
+                              ) : revealed ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                                  <div>
+                                    <span className="text-gray-500">Bệnh nhân: </span>
+                                    <span className="font-medium text-gray-900">{revealed.patientName}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-500">SĐT: </span>
+                                    <span className="font-medium text-gray-900">{revealed.phone}</span>
+                                  </div>
+                                  <div className="sm:col-span-2">
+                                    <span className="text-gray-500">Tình trạng: </span>
+                                    <span className="text-gray-700">{revealed.conditionSummary}</span>
+                                  </div>
+                                  {revealed.notes && (
+                                    <div className="sm:col-span-2 lg:col-span-4">
+                                      <span className="text-gray-500">Ghi chú: </span>
+                                      <span className="text-gray-700">{revealed.notes}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : null}
+                            </td>
+                          </tr>
                         )}
-                      </div>
-                    </div>
-                  )}
-
-                  {isDeleted && (
-                    <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
-                      <p className="text-sm text-gray-400">
-                        Dữ liệu đã được xóa theo yêu cầu của bệnh nhân.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                      </>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-6">
+          <div className="flex items-center justify-center gap-2">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
@@ -432,6 +502,7 @@ export default function PartnerDashboardPage() {
             setShowPIIGate(false);
             if (pendingRevealId) {
               handleReveal(pendingRevealId);
+              setExpandedId(pendingRevealId);
               setPendingRevealId(null);
             }
           }}
@@ -447,19 +518,19 @@ export default function PartnerDashboardPage() {
         const statusMessages: Record<string, { title: string; message: string; variant: 'primary' | 'danger'; confirmLabel: string }> = {
           confirmed: {
             title: 'Xác nhận đặt lịch',
-            message: `Bạn có chắc muốn xác nhận đặt lịch #${pendingAction.bookingNumber}?`,
+            message: `Bạn có chắc muốn xác nhận đặt lịch ${pendingAction.bookingNumber}?`,
             variant: 'primary',
             confirmLabel: 'Xác nhận',
           },
           completed: {
             title: 'Hoàn thành đặt lịch',
-            message: `Bạn có chắc muốn đánh dấu hoàn thành đặt lịch #${pendingAction.bookingNumber}?`,
+            message: `Bạn có chắc muốn đánh dấu hoàn thành đặt lịch ${pendingAction.bookingNumber}?`,
             variant: 'primary',
             confirmLabel: 'Hoàn thành',
           },
           cancelled: {
             title: 'Hủy đặt lịch',
-            message: `Bạn có chắc muốn hủy đặt lịch #${pendingAction.bookingNumber}? Hành động này không thể hoàn tác.`,
+            message: `Bạn có chắc muốn hủy đặt lịch ${pendingAction.bookingNumber}? Hành động này không thể hoàn tác.`,
             variant: 'danger',
             confirmLabel: 'Hủy đặt lịch',
           },

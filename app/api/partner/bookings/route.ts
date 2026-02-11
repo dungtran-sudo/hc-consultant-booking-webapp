@@ -17,6 +17,8 @@ export async function GET(request: Request) {
   const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get('limit') || '20')));
   const search = url.searchParams.get('search') || '';
   const status = url.searchParams.get('status') || '';
+  const dateFrom = url.searchParams.get('dateFrom') || '';
+  const dateTo = url.searchParams.get('dateTo') || '';
 
   try {
     const where: Record<string, unknown> = { partnerId, isDeleted: false };
@@ -29,7 +31,14 @@ export async function GET(request: Request) {
       where.status = status;
     }
 
-    const [bookings, total] = await Promise.all([
+    if (dateFrom || dateTo) {
+      const dateFilter: Record<string, string> = {};
+      if (dateFrom) dateFilter.gte = dateFrom;
+      if (dateTo) dateFilter.lte = dateTo;
+      where.preferredDate = dateFilter;
+    }
+
+    const [bookings, total, statusGroups] = await Promise.all([
       prisma.booking.findMany({
         where,
         orderBy: { createdAt: 'desc' },
@@ -51,7 +60,17 @@ export async function GET(request: Request) {
         },
       }),
       prisma.booking.count({ where }),
+      prisma.booking.groupBy({
+        by: ['status'],
+        where: { partnerId, isDeleted: false },
+        _count: true,
+      }),
     ]);
+
+    const statusCounts: Record<string, number> = { pending: 0, confirmed: 0, completed: 0, cancelled: 0 };
+    for (const g of statusGroups) {
+      statusCounts[g.status] = g._count;
+    }
 
     const ip =
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -79,6 +98,7 @@ export async function GET(request: Request) {
       page,
       totalPages: Math.ceil(total / limit),
       partnerName,
+      statusCounts,
     });
   } catch (error) {
     console.error('Error reading bookings:', error);
