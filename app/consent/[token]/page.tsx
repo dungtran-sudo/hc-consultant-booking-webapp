@@ -92,18 +92,65 @@ export default function PatientConsentPage({
   if (accepted) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="bg-white rounded-xl border border-gray-200 p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+        {/* Print styles */}
+        <style>{`
+          @media print {
+            body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+          }
+        `}</style>
+        <div className="bg-white rounded-xl border border-gray-200 p-8 max-w-md w-full">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-bold text-gray-900 mb-2">
+              Cảm ơn bạn!
+            </h1>
+            <p className="text-gray-600">
+              Thông tin đã được chia sẻ thành công với {info?.partnerName}. Nhân viên tư vấn sẽ hoàn tất đặt lịch cho bạn.
+            </p>
           </div>
-          <h1 className="text-xl font-bold text-gray-900 mb-2">
-            Cảm ơn bạn!
-          </h1>
-          <p className="text-gray-600">
-            Thông tin đã được chia sẻ thành công với {info?.partnerName}. Nhân viên tư vấn sẽ hoàn tất đặt lịch cho bạn.
-          </p>
+
+          {/* Print receipt details */}
+          <div className="mt-6 border-t border-gray-200 pt-4 space-y-2 text-sm">
+            <h2 className="font-semibold text-gray-900 hidden print-only" style={{ display: 'none' }}>
+              BIÊN NHẬN ĐỒNG Ý CHIA SẺ THÔNG TIN
+            </h2>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Đối tác:</span>
+              <span className="text-gray-900 font-medium">{info?.partnerName}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Dịch vụ:</span>
+              <span className="text-gray-900 font-medium">{info?.serviceName}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Thông tin chia sẻ:</span>
+              <span className="text-gray-900 text-right max-w-[200px]">{info?.dataDescription}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Thời gian:</span>
+              <span className="text-gray-900">{new Date().toLocaleString('vi-VN')}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Mã xác nhận:</span>
+              <span className="text-gray-900 font-mono text-xs">{token.substring(0, 12)}...</span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => window.print()}
+            className="no-print mt-6 w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            In biên nhận
+          </button>
         </div>
       </div>
     );
