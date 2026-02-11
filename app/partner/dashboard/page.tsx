@@ -3,20 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/components/LoadingSpinner';
-
-interface Booking {
-  timestamp: string;
-  sessionId: string;
-  patientName: string;
-  phone: string;
-  conditionSummary: string;
-  serviceName: string;
-  partnerName: string;
-  branchAddress: string;
-  preferredDate: string;
-  preferredTime: string;
-  notes: string;
-}
+import { MaskedBooking, RevealedPII } from '@/lib/types';
 
 function formatDate(iso: string): string {
   if (!iso) return '';
@@ -36,10 +23,14 @@ function formatDate(iso: string): string {
 
 export default function PartnerDashboardPage() {
   const router = useRouter();
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookings, setBookings] = useState<MaskedBooking[]>([]);
   const [partnerName, setPartnerName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [revealedPII, setRevealedPII] = useState<
+    Record<string, RevealedPII | null>
+  >({});
+  const [revealingId, setRevealingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/partner/bookings')
@@ -59,6 +50,36 @@ export default function PartnerDashboardPage() {
       .catch(() => setError('Lỗi khi tải dữ liệu'))
       .finally(() => setLoading(false));
   }, [router]);
+
+  const handleReveal = async (bookingId: string) => {
+    if (revealedPII[bookingId] !== undefined) return;
+
+    setRevealingId(bookingId);
+    try {
+      const res = await fetch(`/api/partner/bookings/${bookingId}/reveal`, {
+        method: 'POST',
+      });
+      const data = await res.json();
+
+      if (data.deleted) {
+        setRevealedPII((prev) => ({ ...prev, [bookingId]: null }));
+      } else if (data.patientName) {
+        setRevealedPII((prev) => ({
+          ...prev,
+          [bookingId]: {
+            patientName: data.patientName,
+            phone: data.phone,
+            conditionSummary: data.conditionSummary,
+            notes: data.notes,
+          },
+        }));
+      }
+    } catch {
+      setError('Lỗi khi tải chi tiết');
+    } finally {
+      setRevealingId(null);
+    }
+  };
 
   const handleLogout = async () => {
     await fetch('/api/partner/logout', { method: 'POST' });
@@ -100,75 +121,100 @@ export default function PartnerDashboardPage() {
             <p className="text-gray-500">Chưa có đặt lịch nào</p>
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Ngày tạo
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Bệnh nhân
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      SĐT
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Tình trạng
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Dịch vụ
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Chi nhánh
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Ngày muốn khám
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Giờ
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Ghi chú
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {bookings.map((b, i) => (
-                    <tr key={i} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                        {formatDate(b.timestamp)}
-                      </td>
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                        {b.patientName}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        {b.phone}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">
-                        {b.conditionSummary}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+          <div className="space-y-3">
+            {bookings.map((b) => {
+              const revealed = revealedPII[b.id];
+              const isRevealed = b.id in revealedPII;
+              const isRevealing = revealingId === b.id;
+              const isDeleted = isRevealed && revealed === null;
+
+              return (
+                <div
+                  key={b.id}
+                  className="bg-white rounded-xl border border-gray-200 overflow-hidden"
+                >
+                  <div className="px-4 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <span className="text-sm font-mono text-blue-600 font-semibold whitespace-nowrap">
+                        #{b.bookingNumber}
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 truncate">
                         {b.serviceName}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      </span>
+                      <span className="text-sm text-gray-500 whitespace-nowrap hidden sm:inline">
                         {b.branchAddress}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                        {b.preferredDate}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                        {b.preferredTime}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">
-                        {b.notes || '—'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </span>
+                      <span className="text-sm text-gray-500 whitespace-nowrap hidden md:inline">
+                        {b.preferredDate} {b.preferredTime}
+                      </span>
+                      <span className="text-xs text-gray-400 whitespace-nowrap hidden lg:inline">
+                        {formatDate(b.createdAt)}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleReveal(b.id)}
+                      disabled={isRevealed || isRevealing}
+                      className={`text-sm px-3 py-1.5 rounded-lg whitespace-nowrap ml-2 transition-colors ${
+                        isDeleted
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : isRevealed
+                            ? 'bg-green-50 text-green-700 cursor-default'
+                            : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                      }`}
+                    >
+                      {isRevealing
+                        ? 'Đang tải...'
+                        : isDeleted
+                          ? 'Đã xoá'
+                          : isRevealed
+                            ? 'Đã xem'
+                            : 'Xem chi tiết'}
+                    </button>
+                  </div>
+
+                  {isRevealed && revealed && (
+                    <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-gray-500">Bệnh nhân: </span>
+                          <span className="font-medium text-gray-900">
+                            {revealed.patientName}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">SĐT: </span>
+                          <span className="font-medium text-gray-900">
+                            {revealed.phone}
+                          </span>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <span className="text-gray-500">Tình trạng: </span>
+                          <span className="text-gray-700">
+                            {revealed.conditionSummary}
+                          </span>
+                        </div>
+                        {revealed.notes && (
+                          <div className="sm:col-span-2">
+                            <span className="text-gray-500">Ghi chú: </span>
+                            <span className="text-gray-700">
+                              {revealed.notes}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {isDeleted && (
+                    <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
+                      <p className="text-sm text-gray-400">
+                        Dữ liệu đã được xoá theo yêu cầu của bệnh nhân.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </main>

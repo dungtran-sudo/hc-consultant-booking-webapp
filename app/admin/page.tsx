@@ -28,6 +28,11 @@ interface FormConfig {
 
 const FIELD_TYPES = ['text', 'number', 'select', 'textarea', 'checkbox-group'];
 
+const ADMIN_SECTIONS = [
+  { id: 'form-config', label: 'Form Config' },
+  { id: 'delete-data', label: 'Xoá dữ liệu' },
+];
+
 const TABS = [
   { id: 'common', label: 'Chung' },
   { id: 'nhi', label: 'Nhi khoa' },
@@ -212,9 +217,145 @@ function FieldCard({
   );
 }
 
+function DeletePatientSection() {
+  const [adminSecret, setAdminSecret] = useState('');
+  const [phone, setPhone] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [result, setResult] = useState<{
+    found: boolean;
+    deleted: number;
+  } | null>(null);
+  const [error, setError] = useState('');
+  const [confirmText, setConfirmText] = useState('');
+
+  const handleDelete = async () => {
+    if (confirmText !== 'XOA') return;
+
+    setDeleting(true);
+    setError('');
+    setResult(null);
+
+    try {
+      const res = await fetch('/api/admin/delete-patient', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminSecret}`,
+        },
+        body: JSON.stringify({ phone: phone.trim() }),
+      });
+
+      if (res.status === 401) {
+        setError('Sai mã admin');
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setResult(data);
+        setPhone('');
+        setConfirmText('');
+      }
+    } catch {
+      setError('Lỗi kết nối');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <p className="text-sm text-red-700 font-medium">
+          Xoá toàn bộ dữ liệu bệnh nhân (crypto-shredding). Hành động này
+          không thể hoàn tác.
+        </p>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Mã admin
+          </label>
+          <input
+            type="password"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            value={adminSecret}
+            onChange={(e) => setAdminSecret(e.target.value)}
+            placeholder="ADMIN_SECRET"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Số điện thoại bệnh nhân
+          </label>
+          <input
+            type="text"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="0901234567"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Nhập &quot;XOA&quot; để xác nhận
+          </label>
+          <input
+            type="text"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            value={confirmText}
+            onChange={(e) => setConfirmText(e.target.value)}
+            placeholder="XOA"
+          />
+        </div>
+
+        <button
+          onClick={handleDelete}
+          disabled={
+            deleting ||
+            !adminSecret ||
+            !phone.trim() ||
+            confirmText !== 'XOA'
+          }
+          className="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50"
+        >
+          {deleting ? 'Đang xoá...' : 'Xoá dữ liệu bệnh nhân'}
+        </button>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
+
+        {result && (
+          <div
+            className={`px-4 py-3 rounded-lg text-sm border ${
+              result.found
+                ? 'bg-green-50 border-green-200 text-green-700'
+                : 'bg-yellow-50 border-yellow-200 text-yellow-700'
+            }`}
+          >
+            {result.found
+              ? `Đã xoá thành công ${result.deleted} đặt lịch.`
+              : 'Không tìm thấy dữ liệu cho số điện thoại này.'}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const [config, setConfig] = useState<FormConfig | null>(null);
   const [activeTab, setActiveTab] = useState('common');
+  const [activeSection, setActiveSection] = useState('form-config');
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
@@ -309,65 +450,88 @@ export default function AdminPage() {
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Form Config</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Admin</h1>
           <Link href="/" className="text-blue-600 hover:underline text-sm">
             Trang chủ
           </Link>
         </div>
 
-        {/* Tabs */}
-        <div className="flex flex-wrap gap-1 mb-6 border-b border-gray-200">
-          {TABS.map((tab) => (
+        {/* Section selector */}
+        <div className="flex gap-2 mb-6">
+          {ADMIN_SECTIONS.map((sec) => (
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-sm font-medium rounded-t-lg ${
-                activeTab === tab.id
+              key={sec.id}
+              onClick={() => setActiveSection(sec.id)}
+              className={`px-4 py-2 text-sm font-semibold rounded-lg ${
+                activeSection === sec.id
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
               }`}
             >
-              {tab.label}
+              {sec.label}
             </button>
           ))}
         </div>
 
-        {/* Fields */}
-        <div className="space-y-3">
-          {fields.map((field, i) => (
-            <FieldCard
-              key={field.id}
-              field={field}
-              index={i}
-              total={fields.length}
-              onUpdate={(updated) => updateField(i, updated)}
-              onDelete={() => deleteField(i)}
-              onMove={(dir) => moveField(i, dir)}
-            />
-          ))}
-        </div>
+        {activeSection === 'delete-data' ? (
+          <DeletePatientSection />
+        ) : (
+          <>
+            {/* Tabs */}
+            <div className="flex flex-wrap gap-1 mb-6 border-b border-gray-200">
+              {TABS.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-4 py-2 text-sm font-medium rounded-t-lg ${
+                    activeTab === tab.id
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
 
-        <button
-          onClick={addField}
-          className="mt-4 w-full border-2 border-dashed border-gray-300 rounded-lg py-3 text-gray-500 hover:border-blue-400 hover:text-blue-600 transition-colors"
-        >
-          + Thêm field mới
-        </button>
+            {/* Fields */}
+            <div className="space-y-3">
+              {fields.map((field, i) => (
+                <FieldCard
+                  key={field.id}
+                  field={field}
+                  index={i}
+                  total={fields.length}
+                  onUpdate={(updated) => updateField(i, updated)}
+                  onDelete={() => deleteField(i)}
+                  onMove={(dir) => moveField(i, dir)}
+                />
+              ))}
+            </div>
 
-        <div className="mt-6 flex items-center gap-4">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save Config'}
-          </button>
-          {saveMessage && (
-            <p className={`text-sm ${saveMessage.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
-              {saveMessage}
-            </p>
-          )}
-        </div>
+            <button
+              onClick={addField}
+              className="mt-4 w-full border-2 border-dashed border-gray-300 rounded-lg py-3 text-gray-500 hover:border-blue-400 hover:text-blue-600 transition-colors"
+            >
+              + Thêm field mới
+            </button>
+
+            <div className="mt-6 flex items-center gap-4">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {saving ? 'Saving...' : 'Save Config'}
+              </button>
+              {saveMessage && (
+                <p className={`text-sm ${saveMessage.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+                  {saveMessage}
+                </p>
+              )}
+            </div>
+          </>
+        )}
       </main>
     </div>
   );

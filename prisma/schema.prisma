@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Consent {
+  id              String   @id @default(cuid())
+  phoneHash       String
+  version         String
+  consentTextHash String
+  ip              String
+  createdAt       DateTime @default(now())
+
+  @@index([phoneHash])
+  @@map("consents")
+}
+
+model Booking {
+  id             String   @id @default(cuid())
+  bookingNumber  Int      @default(autoincrement())
+  phoneHash      String
+  sessionId      String
+  patientNameEnc String
+  phoneEnc       String
+  conditionEnc   String
+  notesEnc       String
+  serviceName    String
+  specialty      String
+  partnerId      String
+  partnerName    String
+  branchAddress  String
+  preferredDate  String
+  preferredTime  String
+  encKeyId       String
+  isDeleted      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime
+
+  @@index([phoneHash])
+  @@index([partnerId])
+  @@index([expiresAt])
+  @@map("bookings")
+}
+
+model EncryptionKey {
+  id          String   @id @default(cuid())
+  phoneHash   String   @unique
+  keyMaterial String
+  createdAt   DateTime @default(now())
+  isRevoked   Boolean  @default(false)
+
+  @@map("encryption_keys")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorType String
+  actorId   String
+  action    String
+  bookingId String?
+  metadata  String?
+  ip        String
+  createdAt DateTime @default(now())
+
+  @@index([actorId])
+  @@index([bookingId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model DeletionRequest {
+  id          String    @id @default(cuid())
+  phoneHash   String
+  status      String    @default("pending")
+  requestedBy String
+  requestedAt DateTime  @default(now())
+  completedAt DateTime?
+
+  @@index([phoneHash])
+  @@map("deletion_requests")
+}

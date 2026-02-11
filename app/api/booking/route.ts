@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { appendBookingRow } from '@/lib/sheets';
+import { prisma } from '@/lib/db';
+import { encryptBookingPII, hashPhone } from '@/lib/crypto';
+import { validateConsentHash } from '@/lib/consent';
 import { sendBookingEmail } from '@/lib/mailer';
 import { BookingPayload } from '@/lib/types';
 import partnersData from '@/data/partners.json';
@@ -8,36 +10,102 @@ import { Partner } from '@/lib/types';
 export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as BookingPayload;
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      'unknown';
 
-    // Write to Google Sheet
-    try {
-      await appendBookingRow(payload);
-    } catch (sheetError: unknown) {
-      const msg = sheetError instanceof Error ? sheetError.message : String(sheetError);
-      console.error('Google Sheets error:', msg, sheetError);
+    // Validate consent
+    if (
+      !payload.consentVersion ||
+      !payload.consentTextHash ||
+      !validateConsentHash(payload.consentVersion, payload.consentTextHash)
+    ) {
       return NextResponse.json(
-        { error: `Lỗi khi lưu thông tin đặt lịch: ${msg}` },
-        { status: 500 }
+        { error: 'Consent không hợp lệ. Vui lòng thử lại.' },
+        { status: 400 }
       );
     }
 
-    // Send email to partner
+    // Encrypt PII
+    const encrypted = await encryptBookingPII(payload.phone, {
+      patientName: payload.patientName,
+      phone: payload.phone,
+      conditionSummary: payload.conditionSummary,
+      notes: payload.notes,
+    });
+
+    const expiresAt = new Date();
+    expiresAt.setMonth(expiresAt.getMonth() + 12);
+
+    // Record consent
+    await prisma.consent.create({
+      data: {
+        phoneHash: encrypted.phoneHash,
+        version: payload.consentVersion,
+        consentTextHash: payload.consentTextHash,
+        ip,
+      },
+    });
+
+    // Create booking
+    const booking = await prisma.booking.create({
+      data: {
+        phoneHash: encrypted.phoneHash,
+        sessionId: payload.sessionId,
+        patientNameEnc: encrypted.patientNameEnc,
+        phoneEnc: encrypted.phoneEnc,
+        conditionEnc: encrypted.conditionEnc,
+        notesEnc: encrypted.notesEnc,
+        serviceName: payload.serviceName,
+        specialty: payload.serviceId || '',
+        partnerId: payload.partnerId,
+        partnerName: payload.partnerName,
+        branchAddress: payload.branchAddress,
+        preferredDate: payload.preferredDate,
+        preferredTime: payload.preferredTime,
+        encKeyId: encrypted.encKeyId,
+        expiresAt,
+      },
+    });
+
+    // Audit log
+    await prisma.auditLog.create({
+      data: {
+        actorType: 'system',
+        actorId: 'booking-api',
+        action: 'consent_given',
+        bookingId: booking.id,
+        metadata: JSON.stringify({
+          consentVersion: payload.consentVersion,
+          partnerId: payload.partnerId,
+        }),
+        ip,
+      },
+    });
+
+    // Send masked email to partner
     const partner = (partnersData as Partner[]).find(
       (p) => p.id === payload.partnerId
     );
     if (partner?.booking_email) {
       try {
-        await sendBookingEmail(partner.booking_email, payload);
+        await sendBookingEmail(partner.booking_email, {
+          bookingNumber: booking.bookingNumber,
+          serviceName: payload.serviceName,
+          preferredDate: payload.preferredDate,
+          preferredTime: payload.preferredTime,
+          branchAddress: payload.branchAddress,
+          partnerName: payload.partnerName,
+        });
       } catch (emailError) {
         console.warn('Email send failed (non-critical):', emailError);
       }
-    } else {
-      console.warn(
-        `No booking email for partner ${payload.partnerId}, skipping email.`
-      );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      bookingNumber: booking.bookingNumber,
+    });
   } catch (error) {
     console.error('Booking API error:', error);
     return NextResponse.json(

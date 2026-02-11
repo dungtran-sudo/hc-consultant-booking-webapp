@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { Partner, Service, BookingPayload } from '@/lib/types';
+import { CURRENT_CONSENT } from '@/lib/consent';
+import ConsentModal from './ConsentModal';
 
 interface BookingModalProps {
   partner: Partner;
@@ -35,6 +37,8 @@ export default function BookingModal({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [showConsent, setShowConsent] = useState(false);
+  const [consent, setConsent] = useState<{ version: string; hash: string } | null>(null);
 
   const branches = partner.branches || [
     { id: partner.id, city: partner.city, address: partner.address },
@@ -50,6 +54,21 @@ export default function BookingModal({
       return;
     }
 
+    if (!consent) {
+      setShowConsent(true);
+      return;
+    }
+
+    await submitBooking(consent.version, consent.hash);
+  };
+
+  const handleConsentAccept = async (version: string, hash: string) => {
+    setConsent({ version, hash });
+    setShowConsent(false);
+    await submitBooking(version, hash);
+  };
+
+  const submitBooking = async (consentVersion: string, consentTextHash: string) => {
     setLoading(true);
     setError('');
 
@@ -67,6 +86,8 @@ export default function BookingModal({
       preferredDate: form.preferredDate,
       preferredTime: form.preferredTime,
       notes: form.notes,
+      consentVersion,
+      consentTextHash,
     };
 
     try {
@@ -180,6 +201,16 @@ export default function BookingModal({
           </button>
         </form>
       </div>
+
+      {showConsent && (
+        <ConsentModal
+          consentText={CURRENT_CONSENT.text}
+          version={CURRENT_CONSENT.version}
+          hash={CURRENT_CONSENT.hash}
+          onAccept={handleConsentAccept}
+          onCancel={() => setShowConsent(false)}
+        />
+      )}
     </div>
   );
 }

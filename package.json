@@ -6,14 +6,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "sync-partners": "npx tsx scripts/sync-partners.ts"
+    "sync-partners": "npx tsx scripts/sync-partners.ts",
+    "postinstall": "npx prisma generate"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "@prisma/adapter-neon": "^7.3.0",
+    "@prisma/client": "^7.3.0",
     "dotenv": "^17.2.4",
     "googleapis": "^171.4.0",
     "next": "16.1.6",
     "nodemailer": "^8.0.1",
     "openai": "^6.19.0",
+    "prisma": "^7.3.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },

@@ -121,4 +121,24 @@ export interface BookingPayload {
   preferredDate: string;
   preferredTime: string;
   notes: string;
+  consentVersion: string;
+  consentTextHash: string;
+}
+
+export interface MaskedBooking {
+  id: string;
+  bookingNumber: number;
+  serviceName: string;
+  specialty: string;
+  branchAddress: string;
+  preferredDate: string;
+  preferredTime: string;
+  createdAt: string;
+}
+
+export interface RevealedPII {
+  patientName: string;
+  phone: string;
+  conditionSummary: string;
+  notes: string;
 }
