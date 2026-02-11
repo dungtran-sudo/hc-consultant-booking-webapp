@@ -17,12 +17,6 @@ function getAuth() {
     );
   }
 
-  console.log('[sheets debug] clientEmail:', clientEmail);
-  console.log('[sheets debug] key length:', privateKey.length);
-  console.log('[sheets debug] key starts with BEGIN:', privateKey.startsWith('-----BEGIN'));
-  console.log('[sheets debug] key has real newlines:', privateKey.includes('\n'));
-  console.log('[sheets debug] key first 30:', privateKey.substring(0, 30));
-
   return new google.auth.GoogleAuth({
     credentials: {
       client_email: clientEmail,
