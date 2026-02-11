@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import openai from '@/lib/openai';
+import { getOpenAI } from '@/lib/openai';
 import { buildPrompt } from '@/lib/prompts';
 import { FormData } from '@/lib/types';
 
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
     const prompt = buildPrompt(specialty, formData);
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: 'gpt-4o',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 2000,
