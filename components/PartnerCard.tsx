@@ -6,15 +6,25 @@ interface PartnerCardProps {
   partner: Partner;
   recommendedSpecialties: string[];
   onBooking: (partner: Partner, service?: Service) => void;
+  showRelevanceBadge?: boolean;
 }
 
-export default function PartnerCard({ partner, recommendedSpecialties, onBooking }: PartnerCardProps) {
+export default function PartnerCard({ partner, recommendedSpecialties, onBooking, showRelevanceBadge }: PartnerCardProps) {
   const relevantServices = partner.services.filter((s) =>
     recommendedSpecialties.includes(s.specialty)
   );
 
+  const isRelevant = partner.specialties.some((s) => recommendedSpecialties.includes(s));
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+      {showRelevanceBadge && (
+        isRelevant ? (
+          <span className="inline-block bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full mb-2">Phù hợp chuyên khoa</span>
+        ) : (
+          <span className="inline-block bg-gray-100 text-gray-500 text-xs font-medium px-2 py-0.5 rounded-full mb-2">Không phù hợp chuyên khoa</span>
+        )
+      )}
       <h3 className="text-lg font-bold text-gray-900 mb-1">{partner.name}</h3>
       <p className="text-sm text-gray-500 mb-2">
         {partner.city}{partner.district ? ` - ${partner.district}` : ''}

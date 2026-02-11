@@ -6,6 +6,7 @@ import ConsultForm from '@/components/ConsultForm';
 import AnalysisResult from '@/components/AnalysisResult';
 import PartnerCard from '@/components/PartnerCard';
 import BookingModal from '@/components/BookingModal';
+import PartnerSearch from '@/components/PartnerSearch';
 import specialtiesData from '@/data/specialties.json';
 import { filterPartners } from '@/lib/partners';
 import {
@@ -136,6 +137,14 @@ export default function ConsultPage({
                 </p>
               )}
             </div>
+
+            {/* Partner Search */}
+            <PartnerSearch
+              recommendedSpecialties={result.recommendedSpecialties}
+              onBooking={(partner, service) =>
+                setBookingPartner({ partner, service })
+              }
+            />
           </div>
         )}
 

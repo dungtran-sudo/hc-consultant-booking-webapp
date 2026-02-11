@@ -198,6 +198,30 @@ async function main() {
   for (const p of output) {
     console.log(`  ${p.id}: ${p.name} (${p.branches.length} branches, ${p.services.length} services)`);
   }
+
+  // Optionally sync partner passwords from PartnerAuth tab
+  try {
+    console.log('\nReading PartnerAuth tab...');
+    const authRows = await readSheet(sheets, spreadsheetId, 'PartnerAuth!A:B');
+    if (authRows.length >= 2) {
+      const [, ...dataRows] = authRows;
+      const passwords: Record<string, string> = {};
+      for (const row of dataRows) {
+        const pid = (row[0] || '').trim();
+        const pwd = (row[1] || '').trim();
+        if (pid && pwd) {
+          passwords[pid] = pwd;
+        }
+      }
+      const authOutPath = path.resolve(__dirname, '../data/partner-passwords.json');
+      fs.writeFileSync(authOutPath, JSON.stringify(passwords, null, 2) + '\n');
+      console.log(`  Written ${Object.keys(passwords).length} partner passwords to data/partner-passwords.json`);
+    } else {
+      console.log('  PartnerAuth tab is empty, skipping');
+    }
+  } catch {
+    console.log('  PartnerAuth tab not found, skipping (using existing partner-passwords.json)');
+  }
 }
 
 main().catch((err) => {

@@ -37,7 +37,7 @@ export async function appendBookingRow(payload: BookingPayload): Promise<void> {
 
   await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range: 'Sheet1!A:K',
+    range: 'Sheet1!A:L',
     valueInputOption: 'USER_ENTERED',
     requestBody: {
       values: [[
@@ -52,7 +52,59 @@ export async function appendBookingRow(payload: BookingPayload): Promise<void> {
         payload.preferredDate,
         payload.preferredTime,
         payload.notes,
+        payload.partnerId,
       ]],
     },
   });
+}
+
+export interface BookingRow {
+  timestamp: string;
+  sessionId: string;
+  patientName: string;
+  phone: string;
+  conditionSummary: string;
+  serviceName: string;
+  partnerName: string;
+  branchAddress: string;
+  preferredDate: string;
+  preferredTime: string;
+  notes: string;
+  partnerId: string;
+}
+
+export async function readBookingsByPartner(partnerId: string): Promise<BookingRow[]> {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+
+  if (!spreadsheetId) {
+    throw new Error('Missing GOOGLE_SHEET_ID');
+  }
+
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: 'Sheet1!A:L',
+  });
+
+  const rows = response.data.values || [];
+
+  const bookings = rows
+    .filter((row) => row[11] === partnerId)
+    .map((row) => ({
+      timestamp: row[0] || '',
+      sessionId: row[1] || '',
+      patientName: row[2] || '',
+      phone: row[3] || '',
+      conditionSummary: row[4] || '',
+      serviceName: row[5] || '',
+      partnerName: row[6] || '',
+      branchAddress: row[7] || '',
+      preferredDate: row[8] || '',
+      preferredTime: row[9] || '',
+      notes: row[10] || '',
+      partnerId: row[11] || '',
+    }));
+
+  return bookings.reverse();
 }

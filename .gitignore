@@ -39,6 +39,10 @@ yarn-error.log*
 # guides
 HOW_TO_GUIDE.md
 
+#google credentials
+creds.txt
+creds.text
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
