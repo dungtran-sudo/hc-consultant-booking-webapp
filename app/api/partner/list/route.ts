@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { loadPartners } from '@/lib/partners';
-import { getPortalPartnerIds } from '@/lib/partner-auth';
+import { prisma } from '@/lib/db';
 
 export async function GET() {
-  const partners = loadPartners();
-  const portalIds = getPortalPartnerIds();
-  const portalPartners = partners
-    .filter((p) => portalIds.includes(p.id))
-    .map((p) => ({ id: p.id, name: p.name }));
+  const portalPartners = await prisma.partner.findMany({
+    where: { passwordHash: { not: null }, isActive: true },
+    select: { id: true, name: true },
+    orderBy: { name: 'asc' },
+  });
   return NextResponse.json({ partners: portalPartners });
 }

@@ -1,9 +1,9 @@
 export interface Partner {
   id: string;
   name: string;
+  type: string;
   website: string;
-  crawl_urls: string[];
-  booking_email: string;
+  bookingEmail: string;
   phone: string;
   city: string;
   district: string;
@@ -12,13 +12,16 @@ export interface Partner {
   specialties: string[];
   notes: string;
   services: Service[];
+  isActive?: boolean;
 }
 
 export interface Branch {
   id: string;
+  name: string;
   city: string;
   district?: string;
   address: string;
+  phone?: string;
 }
 
 export interface Service {
@@ -26,9 +29,8 @@ export interface Service {
   name: string;
   specialty: string;
   description: string;
-  price_range: string;
+  priceRange: string;
   duration: string;
-  notes: string;
 }
 
 export interface Specialty {

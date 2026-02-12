@@ -1,4 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { createMockPrisma, MockPrisma } from '../../helpers/mock-prisma';
+
+vi.mock('@/lib/db', () => ({
+  prisma: createMockPrisma(),
+}));
+
+vi.mock('@/lib/staff-auth', () => ({
+  verifyPassword: vi.fn((password: string, hash: string) => {
+    // Simple mock: password matches if hash ends with the password
+    return hash === `salt:${password}`;
+  }),
+}));
+
+import { prisma } from '@/lib/db';
+const mockPrisma = prisma as unknown as MockPrisma;
 
 import {
   createSessionToken,
@@ -47,15 +62,54 @@ describe('verifySessionToken', () => {
 });
 
 describe('validateLogin', () => {
-  it('returns true for valid credentials', () => {
-    expect(validateLogin('vinmec', 'vinmec2024')).toBe(true);
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it('returns false for wrong password', () => {
-    expect(validateLogin('vinmec', 'wrongpassword')).toBe(false);
+  it('returns true for valid credentials', async () => {
+    mockPrisma.partner.findUnique.mockResolvedValue({
+      passwordHash: 'salt:correctpass',
+      isActive: true,
+    });
+
+    const result = await validateLogin('vinmec', 'correctpass');
+    expect(result).toBe(true);
   });
 
-  it('returns false for non-existent partner', () => {
-    expect(validateLogin('nonexistent-partner', 'anything')).toBe(false);
+  it('returns false for wrong password', async () => {
+    mockPrisma.partner.findUnique.mockResolvedValue({
+      passwordHash: 'salt:correctpass',
+      isActive: true,
+    });
+
+    const result = await validateLogin('vinmec', 'wrongpassword');
+    expect(result).toBe(false);
+  });
+
+  it('returns false for non-existent partner', async () => {
+    mockPrisma.partner.findUnique.mockResolvedValue(null);
+
+    const result = await validateLogin('nonexistent-partner', 'anything');
+    expect(result).toBe(false);
+  });
+
+  it('returns false for inactive partner', async () => {
+    mockPrisma.partner.findUnique.mockResolvedValue({
+      passwordHash: 'salt:correctpass',
+      isActive: false,
+    });
+
+    const result = await validateLogin('vinmec', 'correctpass');
+    expect(result).toBe(false);
+  });
+
+  it('returns false for partner without password', async () => {
+    mockPrisma.partner.findUnique.mockResolvedValue({
+      passwordHash: null,
+      isActive: true,
+    });
+
+    const result = await validateLogin('vinmec', 'anything');
+    expect(result).toBe(false);
   });
 });

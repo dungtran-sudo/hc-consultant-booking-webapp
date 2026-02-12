@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
-import { loadPartners } from './partners';
-import passwordsData from '@/data/partner-passwords.json';
+import { prisma } from './db';
+import { verifyPassword } from './staff-auth';
 
 const COOKIE_NAME = 'partner_session';
 
@@ -28,19 +28,28 @@ export function verifySessionToken(token: string): string | null {
   return partnerId;
 }
 
-export function validateLogin(partnerId: string, password: string): boolean {
-  const passwords = passwordsData as Record<string, string>;
-  if (!passwords[partnerId]) return false;
-  return passwords[partnerId] === password;
+export async function validateLogin(partnerId: string, password: string): Promise<boolean> {
+  const partner = await prisma.partner.findUnique({
+    where: { id: partnerId },
+    select: { passwordHash: true, isActive: true },
+  });
+  if (!partner || !partner.passwordHash || !partner.isActive) return false;
+  return verifyPassword(password, partner.passwordHash);
 }
 
-export function getPortalPartnerIds(): string[] {
-  return Object.keys(passwordsData as Record<string, string>);
+export async function getPortalPartnerIds(): Promise<string[]> {
+  const partners = await prisma.partner.findMany({
+    where: { passwordHash: { not: null }, isActive: true },
+    select: { id: true },
+  });
+  return partners.map((p) => p.id);
 }
 
-export function getPartnerName(partnerId: string): string {
-  const partners = loadPartners();
-  const partner = partners.find((p) => p.id === partnerId);
+export async function getPartnerName(partnerId: string): Promise<string> {
+  const partner = await prisma.partner.findUnique({
+    where: { id: partnerId },
+    select: { name: true },
+  });
   return partner?.name || partnerId;
 }
 

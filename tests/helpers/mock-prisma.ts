@@ -25,6 +25,7 @@ export function createMockPrisma() {
     encryptionKey: createModelMock(),
     auditLog: createModelMock(),
     deletionRequest: createModelMock(),
+    partner: createModelMock(),
   };
 }
 

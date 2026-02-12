@@ -130,3 +130,60 @@ model DeletionRequest {
   @@index([phoneHash])
   @@map("deletion_requests")
 }
+
+model Partner {
+  id           String   @id
+  name         String
+  type         String   @default("hospital")
+  website      String   @default("")
+  bookingEmail String   @default("")
+  phone        String   @default("")
+  city         String   @default("")
+  district     String   @default("")
+  address      String   @default("")
+  specialties  String[] @default([])
+  notes        String   @default("")
+  passwordHash String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  branches PartnerBranch[]
+  services PartnerService[]
+
+  @@map("partners")
+}
+
+model PartnerService {
+  id          String  @id @default(cuid())
+  partnerId   String
+  name        String
+  specialty   String
+  description String  @default("")
+  priceRange  String  @default("")
+  duration    String  @default("")
+  isActive    Boolean @default(true)
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId])
+  @@index([specialty])
+  @@map("partner_services")
+}
+
+model PartnerBranch {
+  id        String  @id @default(cuid())
+  partnerId String
+  name      String  @default("")
+  city      String
+  district  String  @default("")
+  address   String
+  phone     String  @default("")
+  isActive  Boolean @default(true)
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId])
+  @@index([city])
+  @@map("partner_branches")
+}

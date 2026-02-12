@@ -51,11 +51,13 @@ export async function GET(request: Request) {
       statusCounts[s.status] = s._count;
     }
 
-    const partnerStats = byPartner.map((p) => ({
-      partnerId: p.partnerId,
-      partnerName: getPartnerName(p.partnerId),
-      count: p._count,
-    }));
+    const partnerStats = await Promise.all(
+      byPartner.map(async (p) => ({
+        partnerId: p.partnerId,
+        partnerName: await getPartnerName(p.partnerId),
+        count: p._count,
+      }))
+    );
 
     return NextResponse.json({
       totalActive,

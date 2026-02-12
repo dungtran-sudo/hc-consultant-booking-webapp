@@ -44,7 +44,7 @@ export default function BookingModal({
   const [creatingToken, setCreatingToken] = useState(false);
 
   const branches = partner.branches || [
-    { id: partner.id, city: partner.city, address: partner.address },
+    { id: partner.id, name: '', city: partner.city, address: partner.address },
   ];
 
   const selectedBranch = branches.find((b) => b.id === form.branchId) || branches[0];
@@ -224,7 +224,7 @@ export default function BookingModal({
             <select className={inputClass} value={form.branchId} onChange={(e) => setForm({ ...form, branchId: e.target.value })}>
               {branches.map((b) => (
                 <option key={b.id} value={b.id}>
-                  {b.city} - {b.address}
+                  {b.name ? `${b.name} — ` : ''}{b.city} - {b.address}
                 </option>
               ))}
             </select>

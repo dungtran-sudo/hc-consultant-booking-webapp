@@ -104,6 +104,30 @@ export function makeEncryptionKey(overrides?: Record<string, unknown>) {
   };
 }
 
+export function makePartner(overrides?: Record<string, unknown>) {
+  counter++;
+  return {
+    id: `partner-${counter}`,
+    name: `Partner ${counter}`,
+    type: 'hospital',
+    website: '',
+    bookingEmail: '',
+    phone: '',
+    city: 'TP.HCM',
+    district: '',
+    address: '123 Test St',
+    specialties: ['nhi'],
+    notes: '',
+    passwordHash: null,
+    isActive: true,
+    createdAt: new Date('2026-02-10'),
+    updatedAt: new Date('2026-02-10'),
+    branches: [],
+    services: [],
+    ...overrides,
+  };
+}
+
 export function makeConsent(overrides?: Record<string, unknown>) {
   counter++;
   return {

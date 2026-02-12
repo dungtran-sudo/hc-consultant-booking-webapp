@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { loadPartners } from '@/lib/partners';
+import { useState, useEffect } from 'react';
 import { Partner, Service } from '@/lib/types';
 import PartnerCard from './PartnerCard';
 
@@ -10,16 +9,34 @@ interface PartnerSearchProps {
   onBooking: (partner: Partner, service?: Service) => void;
 }
 
-const allPartners = loadPartners();
-
 export default function PartnerSearch({ recommendedSpecialties, onBooking }: PartnerSearchProps) {
   const [query, setQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Partner[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const searchResults = query.trim().length >= 2
-    ? allPartners.filter((p) =>
-        p.name.toLowerCase().includes(query.toLowerCase().trim())
-      )
-    : [];
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/partners?search=${encodeURIComponent(query.trim())}`);
+        if (res.ok) {
+          const data = await res.json();
+          setSearchResults(data.partners);
+        }
+      } catch {
+        // Silently fail
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [query]);
 
   return (
     <div className="mt-8 border-t pt-6">
@@ -33,7 +50,11 @@ export default function PartnerSearch({ recommendedSpecialties, onBooking }: Par
       />
       <p className="text-xs text-gray-400 mt-1">Nhập từ 2 ký tự trở lên để tìm kiếm</p>
 
-      {searchResults.length > 0 && (
+      {loading && (
+        <p className="text-gray-500 text-sm mt-4">Đang tìm kiếm...</p>
+      )}
+
+      {!loading && searchResults.length > 0 && (
         <div className="mt-4">
           <p className="text-sm text-gray-600 mb-3">
             Tìm thấy {searchResults.length} đối tác
@@ -52,7 +73,7 @@ export default function PartnerSearch({ recommendedSpecialties, onBooking }: Par
         </div>
       )}
 
-      {query.trim().length >= 2 && searchResults.length === 0 && (
+      {!loading && query.trim().length >= 2 && searchResults.length === 0 && (
         <p className="text-gray-500 italic mt-4">Không tìm thấy đối tác nào</p>
       )}
     </div>

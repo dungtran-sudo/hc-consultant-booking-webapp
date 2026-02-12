@@ -14,7 +14,7 @@ vi.mock('@/lib/crypto', () => ({
 const mockGetSessionPartnerId = vi.fn();
 vi.mock('@/lib/partner-auth', () => ({
   getSessionPartnerId: (...args: unknown[]) => mockGetSessionPartnerId(...args),
-  getPartnerName: vi.fn((id: string) => (id === 'vinmec' ? 'Vinmec' : id)),
+  getPartnerName: vi.fn(async (id: string) => (id === 'vinmec' ? 'Vinmec' : id)),
 }));
 
 import { prisma } from '@/lib/db';

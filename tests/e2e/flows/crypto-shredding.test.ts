@@ -17,7 +17,7 @@ vi.mock('@/lib/crypto', () => ({
 const mockGetSessionPartnerId = vi.fn();
 vi.mock('@/lib/partner-auth', () => ({
   getSessionPartnerId: (...args: unknown[]) => mockGetSessionPartnerId(...args),
-  getPartnerName: vi.fn((id: string) => id),
+  getPartnerName: vi.fn(async (id: string) => id),
 }));
 
 vi.mock('@/lib/admin-auth', () => ({

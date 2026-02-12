@@ -154,6 +154,7 @@ describe('Staff Consult-to-Booking Flow', () => {
     mockPrisma.booking.create.mockResolvedValueOnce(createdBooking);
     mockPrisma.auditLog.create.mockResolvedValueOnce({});
     mockPrisma.consentToken.update.mockResolvedValueOnce({});
+    mockPrisma.partner.findUnique.mockResolvedValueOnce({ bookingEmail: 'test@vinmec.com' });
 
     const request = createRequest('POST', 'http://localhost:3000/api/booking', {
       body: {

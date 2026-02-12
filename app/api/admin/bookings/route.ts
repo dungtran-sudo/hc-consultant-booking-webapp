@@ -65,14 +65,18 @@ export async function GET(request: Request) {
       prisma.booking.count({ where }),
     ]);
 
-    return NextResponse.json({
-      bookings: bookings.map((b) => ({
+    const enrichedBookings = await Promise.all(
+      bookings.map(async (b) => ({
         ...b,
-        partnerName: b.partnerName || getPartnerName(b.partnerId),
+        partnerName: b.partnerName || (await getPartnerName(b.partnerId)),
         createdAt: b.createdAt.toISOString(),
         confirmedAt: b.confirmedAt?.toISOString() || null,
         completedAt: b.completedAt?.toISOString() || null,
-      })),
+      }))
+    );
+
+    return NextResponse.json({
+      bookings: enrichedBookings,
       total,
       page,
       totalPages: Math.ceil(total / limit),

@@ -10,12 +10,14 @@ vi.mock('@/lib/db', () => ({
 
 const mockGetSessionPartnerId = vi.fn();
 const mockGetPartnerName = vi.fn();
+const mockValidateLogin = vi.fn();
 vi.mock('@/lib/partner-auth', async (importOriginal) => {
   const original = await importOriginal<typeof import('@/lib/partner-auth')>();
   return {
     ...original,
     getSessionPartnerId: (...args: unknown[]) => mockGetSessionPartnerId(...args),
     getPartnerName: (...args: unknown[]) => mockGetPartnerName(...args),
+    validateLogin: (...args: unknown[]) => mockValidateLogin(...args),
   };
 });
 
@@ -38,6 +40,8 @@ describe('Partner Booking Management Flow', () => {
   it('partner logs in and gets cookie', async () => {
     const { POST } = await import('@/app/api/partner/login/route');
 
+    mockValidateLogin.mockResolvedValue(true);
+
     const request = createRequest('POST', 'http://localhost:3000/api/partner/login', {
       body: { partnerId: 'vinmec', password: 'vinmec2024' },
     });
@@ -56,7 +60,7 @@ describe('Partner Booking Management Flow', () => {
     const { GET } = await import('@/app/api/partner/bookings/route');
 
     mockGetSessionPartnerId.mockResolvedValue('vinmec');
-    mockGetPartnerName.mockReturnValue('Vinmec');
+    mockGetPartnerName.mockResolvedValue('Vinmec');
 
     const bookings = [
       makeBooking({ partnerId: 'vinmec', status: 'pending' }),

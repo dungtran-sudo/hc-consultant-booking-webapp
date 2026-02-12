@@ -57,7 +57,7 @@ export default function PartnerCard({ partner, recommendedSpecialties, onBooking
             {relevantServices.map((s) => (
               <li key={s.id} className="text-sm text-gray-600 flex justify-between items-center">
                 <span>{s.name}</span>
-                <span className="text-xs text-gray-400">{s.price_range}</span>
+                <span className="text-xs text-gray-400">{s.priceRange}</span>
               </li>
             ))}
           </ul>

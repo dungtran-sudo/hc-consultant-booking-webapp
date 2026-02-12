@@ -8,7 +8,7 @@ vi.mock('@/lib/db', () => ({
 }));
 
 vi.mock('@/lib/partner-auth', () => ({
-  getPartnerName: vi.fn((id: string) => id.toUpperCase()),
+  getPartnerName: vi.fn(async (id: string) => id.toUpperCase()),
 }));
 
 import { prisma } from '@/lib/db';

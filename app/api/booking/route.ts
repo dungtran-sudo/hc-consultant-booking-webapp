@@ -6,8 +6,6 @@ import { validateConsentHash } from '@/lib/consent';
 import { sendBookingEmail } from '@/lib/mailer';
 import { BookingPayload } from '@/lib/types';
 import { getSessionStaff } from '@/lib/staff-auth';
-import partnersData from '@/data/partners.json';
-import { Partner } from '@/lib/types';
 
 export async function POST(request: Request) {
   try {
@@ -107,12 +105,13 @@ export async function POST(request: Request) {
     }
 
     // Send masked email to partner
-    const partner = (partnersData as Partner[]).find(
-      (p) => p.id === payload.partnerId
-    );
-    if (partner?.booking_email) {
+    const partner = await prisma.partner.findUnique({
+      where: { id: payload.partnerId },
+      select: { bookingEmail: true },
+    });
+    if (partner?.bookingEmail) {
       try {
-        await sendBookingEmail(partner.booking_email, {
+        await sendBookingEmail(partner.bookingEmail, {
           bookingNumber: booking.bookingNumber,
           serviceName: payload.serviceName,
           preferredDate: payload.preferredDate,

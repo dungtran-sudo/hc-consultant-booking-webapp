@@ -38,7 +38,7 @@ describe('GET /api/partner/bookings', () => {
 
   it('returns bookings with statusCounts', async () => {
     mockGetSessionPartnerId.mockResolvedValue('vinmec');
-    mockGetPartnerName.mockReturnValue('Vinmec');
+    mockGetPartnerName.mockResolvedValue('Vinmec');
 
     const booking = makeBooking({ partnerId: 'vinmec' });
     mockPrisma.booking.findMany.mockResolvedValue([booking]);

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!validateLogin(partnerId, password)) {
+    if (!(await validateLogin(partnerId, password))) {
       return NextResponse.json(
         { error: 'Sai mật khẩu hoặc không tìm thấy đối tác' },
         { status: 401 }

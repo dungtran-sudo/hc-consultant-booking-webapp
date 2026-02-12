@@ -8,7 +8,6 @@ import PartnerCard from '@/components/PartnerCard';
 import BookingModal from '@/components/BookingModal';
 import PartnerSearch from '@/components/PartnerSearch';
 import specialtiesData from '@/data/specialties.json';
-import { filterPartners } from '@/lib/partners';
 import StaffAuthGate from '@/components/StaffAuthGate';
 import {
   Specialty,
@@ -48,16 +47,22 @@ export default function ConsultPage({
 
   const resultRef = useRef<HTMLDivElement>(null);
 
-  const handleResult = (data: AnalysisResultType) => {
+  const handleResult = async (data: AnalysisResultType) => {
     setResult(data);
     const effectiveCity = formData.khuVuc === 'Tỉnh khác' && formData.khuVucKhac?.trim()
       ? formData.khuVucKhac.trim()
       : formData.khuVuc;
-    const filtered = filterPartners(
-      data.recommendedSpecialties,
-      effectiveCity
-    );
-    setPartners(filtered.slice(0, 5));
+    try {
+      const res = await fetch(
+        `/api/partners/filter?specialties=${encodeURIComponent(data.recommendedSpecialties.join(','))}&city=${encodeURIComponent(effectiveCity)}`
+      );
+      if (res.ok) {
+        const json = await res.json();
+        setPartners(json.partners.slice(0, 5));
+      }
+    } catch {
+      // Silently fail - partners section will show empty
+    }
   };
 
   useEffect(() => {
