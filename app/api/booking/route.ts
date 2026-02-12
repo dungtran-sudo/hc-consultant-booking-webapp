@@ -6,13 +6,18 @@ import { validateConsentHash } from '@/lib/consent';
 import { sendBookingEmail } from '@/lib/mailer';
 import { BookingPayload } from '@/lib/types';
 import { getSessionStaff } from '@/lib/staff-auth';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 20 requests per hour per IP
+    const ip = getClientIp(request);
+    const rl = await checkRateLimit(`booking:${ip}`, 20, 60 * 60_000);
+    if (!rl.allowed) {
+      return rateLimitResponse(rl, 20);
+    }
+
     const payload = (await request.json()) as BookingPayload;
-    const ip =
-      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      'unknown';
 
     // Validate consent
     if (

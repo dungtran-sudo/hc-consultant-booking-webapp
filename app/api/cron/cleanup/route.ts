@@ -50,6 +50,18 @@ export async function GET(request: Request) {
       data: { isDeleted: true },
     });
 
+    // Clean up old API usage logs (older than 90 days)
+    const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    const deletedUsageLogs = await prisma.apiUsageLog.deleteMany({
+      where: { createdAt: { lt: ninetyDaysAgo } },
+    });
+
+    // Clean up stale rate limit records (older than 24 hours)
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const deletedRateLimits = await prisma.rateLimit.deleteMany({
+      where: { windowStart: { lt: oneDayAgo } },
+    });
+
     await prisma.auditLog.create({
       data: {
         actorType: 'system',
@@ -58,12 +70,18 @@ export async function GET(request: Request) {
         metadata: JSON.stringify({
           bookingsDeleted: expired.length,
           phoneHashesProcessed: phoneHashes.length,
+          usageLogsDeleted: deletedUsageLogs.count,
+          rateLimitsDeleted: deletedRateLimits.count,
         }),
         ip: 'system',
       },
     });
 
-    return NextResponse.json({ deleted: expired.length });
+    return NextResponse.json({
+      deleted: expired.length,
+      usageLogsDeleted: deletedUsageLogs.count,
+      rateLimitsDeleted: deletedRateLimits.count,
+    });
   } catch (error) {
     console.error('Cleanup cron error:', error);
     return NextResponse.json(

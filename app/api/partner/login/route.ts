@@ -1,10 +1,18 @@
 import { NextResponse } from 'next/server';
 import { validateLogin, createSessionToken } from '@/lib/partner-auth';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 const COOKIE_NAME = 'partner_session';
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 5 attempts per 15 minutes per IP
+    const ip = getClientIp(request);
+    const rl = await checkRateLimit(`partner-login:${ip}`, 5, 15 * 60_000);
+    if (!rl.allowed) {
+      return rateLimitResponse(rl, 5);
+    }
+
     const { partnerId, password } = await request.json();
 
     if (!partnerId || !password) {

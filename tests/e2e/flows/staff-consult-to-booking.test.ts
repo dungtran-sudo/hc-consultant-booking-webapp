@@ -56,6 +56,9 @@ describe('Staff Consult-to-Booking Flow', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     clearAllCookies();
+    // Allow rate limit checks to pass
+    mockPrisma.rateLimit.findUnique.mockResolvedValue(null);
+    mockPrisma.rateLimit.upsert.mockResolvedValue({});
   });
 
   it('staff logs in successfully', async () => {

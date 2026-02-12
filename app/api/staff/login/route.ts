@@ -6,9 +6,17 @@ import {
   createStaffSessionToken,
   STAFF_COOKIE_NAME,
 } from '@/lib/staff-auth';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 5 attempts per 15 minutes per IP
+    const ip = getClientIp(request);
+    const rl = await checkRateLimit(`staff-login:${ip}`, 5, 15 * 60_000);
+    if (!rl.allowed) {
+      return rateLimitResponse(rl, 5);
+    }
+
     const { name, password } = await request.json();
 
     if (!name || !password) {
@@ -46,10 +54,6 @@ export async function POST(request: Request) {
       path: '/',
       maxAge: 60 * 60 * 24, // 24 hours
     });
-
-    const ip =
-      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-      'unknown';
 
     await prisma.auditLog.create({
       data: {

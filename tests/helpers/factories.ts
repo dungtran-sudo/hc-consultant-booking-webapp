@@ -128,6 +128,23 @@ export function makePartner(overrides?: Record<string, unknown>) {
   };
 }
 
+export function makeApiUsageLog(overrides?: Record<string, unknown>) {
+  counter++;
+  return {
+    id: `usage-${counter}`,
+    promptTokens: 2500,
+    completionTokens: 3000,
+    totalTokens: 5500,
+    estimatedCostUsd: 0.03625,
+    model: 'gpt-4o',
+    specialty: 'nhi',
+    sessionId: `session-${counter}`,
+    durationMs: 1500,
+    createdAt: new Date('2026-02-10'),
+    ...overrides,
+  };
+}
+
 export function makeConsent(overrides?: Record<string, unknown>) {
   counter++;
   return {

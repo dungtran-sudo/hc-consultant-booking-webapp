@@ -29,6 +29,8 @@ describe('GET /api/cron/cleanup', () => {
 
   it('returns deleted count of 0 when no expired bookings', async () => {
     mockPrisma.booking.findMany.mockResolvedValueOnce([]);
+    mockPrisma.apiUsageLog.deleteMany.mockResolvedValueOnce({ count: 0 });
+    mockPrisma.rateLimit.deleteMany.mockResolvedValueOnce({ count: 0 });
 
     const request = createCronRequest('http://localhost:3000/api/cron/cleanup');
     const response = await GET(request);
@@ -52,6 +54,8 @@ describe('GET /api/cron/cleanup', () => {
 
     mockPrisma.consent.updateMany.mockResolvedValue({ count: 1 });
     mockPrisma.booking.updateMany.mockResolvedValue({ count: 3 });
+    mockPrisma.apiUsageLog.deleteMany.mockResolvedValueOnce({ count: 2 });
+    mockPrisma.rateLimit.deleteMany.mockResolvedValueOnce({ count: 5 });
     mockPrisma.auditLog.create.mockResolvedValue({});
 
     const request = createCronRequest('http://localhost:3000/api/cron/cleanup');

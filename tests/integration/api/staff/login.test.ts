@@ -27,6 +27,9 @@ describe('POST /api/staff/login', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     clearAllCookies();
+    // Allow rate limit checks to pass
+    mockPrisma.rateLimit.findUnique.mockResolvedValue(null);
+    mockPrisma.rateLimit.upsert.mockResolvedValue({});
   });
 
   it('returns 400 when fields are missing', async () => {

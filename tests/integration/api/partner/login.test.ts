@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { createMockPrisma, MockPrisma } from '../../../helpers/mock-prisma';
 import { createRequest } from '../../../helpers/mock-request';
+
+vi.mock('@/lib/db', () => ({
+  prisma: createMockPrisma(),
+}));
 
 const mockValidateLogin = vi.fn();
 vi.mock('@/lib/partner-auth', async (importOriginal) => {
@@ -10,11 +15,17 @@ vi.mock('@/lib/partner-auth', async (importOriginal) => {
   };
 });
 
+import { prisma } from '@/lib/db';
 import { POST } from '@/app/api/partner/login/route';
+
+const mockPrisma = prisma as unknown as MockPrisma;
 
 describe('POST /api/partner/login', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Allow rate limit checks to pass
+    mockPrisma.rateLimit.findUnique.mockResolvedValue(null);
+    mockPrisma.rateLimit.upsert.mockResolvedValue({});
   });
 
   it('returns 400 when fields are missing', async () => {

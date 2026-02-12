@@ -3,6 +3,31 @@
 import { useState, useEffect } from 'react';
 import { useAdminAuth } from './context';
 
+interface UsageStats {
+  daily: {
+    cost: number;
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+    callCount: number;
+    budget: number;
+    utilizationPercent: number;
+  };
+  monthly: {
+    cost: number;
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+    callCount: number;
+    budget: number;
+    utilizationPercent: number;
+  };
+  bySpecialty: {
+    month: { specialty: string; count: number; cost: number }[];
+    today: { specialty: string; count: number; cost: number }[];
+  };
+}
+
 interface AdminStats {
   totalActive: number;
   totalDeleted: number;
@@ -38,22 +63,68 @@ function StatCard({
   );
 }
 
+function UsageBudgetBar({
+  label,
+  used,
+  budget,
+  percent,
+}: {
+  label: string;
+  used: number;
+  budget: number;
+  percent: number;
+}) {
+  const clampedPercent = Math.min(percent, 100);
+  const barColor =
+    percent > 80 ? 'bg-red-500' : percent > 60 ? 'bg-yellow-500' : 'bg-green-500';
+  const textColor =
+    percent > 80 ? 'text-red-700' : percent > 60 ? 'text-yellow-700' : 'text-green-700';
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-sm font-medium text-gray-700">{label}</span>
+        <span className={`text-sm font-bold ${textColor}`}>
+          ${used.toFixed(2)} / ${budget.toFixed(2)} ({percent.toFixed(1)}%)
+        </span>
+      </div>
+      <div className="w-full bg-gray-200 rounded-full h-3">
+        <div
+          className={`${barColor} h-3 rounded-full transition-all duration-500`}
+          style={{ width: `${clampedPercent}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboardPage() {
   const { secret } = useAdminAuth();
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [usageStats, setUsageStats] = useState<UsageStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (!secret) return;
-    fetch('/api/admin/stats', {
-      headers: { Authorization: `Bearer ${secret}` },
-    })
-      .then((r) => {
+    Promise.all([
+      fetch('/api/admin/stats', {
+        headers: { Authorization: `Bearer ${secret}` },
+      }).then((r) => {
         if (!r.ok) throw new Error('Failed to load stats');
         return r.json();
+      }),
+      fetch('/api/admin/usage-stats', {
+        headers: { Authorization: `Bearer ${secret}` },
+      }).then((r) => {
+        if (!r.ok) return null;
+        return r.json();
+      }),
+    ])
+      .then(([statsData, usageData]) => {
+        setStats(statsData);
+        setUsageStats(usageData);
       })
-      .then(setStats)
       .catch(() => setError('Lỗi khi tải dữ liệu'))
       .finally(() => setLoading(false));
   }, [secret]);
@@ -139,6 +210,61 @@ export default function AdminDashboardPage() {
         <StatCard label="Nhật ký kiểm tra" value={stats.totalAuditLogs} color="gray" />
         <StatCard label="Đã xóa" value={stats.totalDeleted} color="gray" />
       </div>
+
+      {/* AI Usage & Budget */}
+      {usageStats && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold text-gray-900">Chi phí AI (OpenAI)</h2>
+
+          {/* Budget progress bars */}
+          <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
+            <UsageBudgetBar
+              label="Hôm nay"
+              used={usageStats.daily.cost}
+              budget={usageStats.daily.budget}
+              percent={usageStats.daily.utilizationPercent}
+            />
+            <UsageBudgetBar
+              label="Tháng này"
+              used={usageStats.monthly.cost}
+              budget={usageStats.monthly.budget}
+              percent={usageStats.monthly.utilizationPercent}
+            />
+          </div>
+
+          {/* Call count stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <StatCard label="Cuộc gọi hôm nay" value={usageStats.daily.callCount} color="blue" />
+            <StatCard label="Cuộc gọi tháng này" value={usageStats.monthly.callCount} color="purple" />
+            <StatCard label="Token hôm nay" value={usageStats.daily.totalTokens} color="gray" />
+            <StatCard label="Token tháng này" value={usageStats.monthly.totalTokens} color="gray" />
+          </div>
+
+          {/* Specialty breakdown */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-100">
+              <h3 className="font-semibold text-gray-900">Cuộc gọi theo chuyên khoa (tháng)</h3>
+            </div>
+            {usageStats.bySpecialty.month.length === 0 ? (
+              <div className="px-4 py-8 text-center text-gray-500 text-sm">
+                Chưa có dữ liệu
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {usageStats.bySpecialty.month.map((s) => (
+                  <div key={s.specialty} className="px-4 py-3 flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm">{s.specialty}</p>
+                      <p className="text-xs text-gray-500">${s.cost.toFixed(3)}</p>
+                    </div>
+                    <span className="text-lg font-bold text-blue-600">{s.count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

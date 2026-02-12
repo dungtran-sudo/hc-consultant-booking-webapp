@@ -11,6 +11,7 @@ process.env.OPENAI_API_KEY = 'sk-test-fake-key';
 process.env.GMAIL_USER = 'test@example.com';
 process.env.GMAIL_APP_PASSWORD = 'test-password';
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
+process.env.LLM_MONTHLY_BUDGET_USD = '200';
 
 // Global mock: next/headers cookies()
 const cookieStore = new Map<string, { name: string; value: string }>();

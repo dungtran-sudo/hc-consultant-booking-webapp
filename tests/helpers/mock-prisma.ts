@@ -13,6 +13,7 @@ function createModelMock() {
     count: vi.fn(),
     groupBy: vi.fn(),
     upsert: vi.fn(),
+    aggregate: vi.fn(),
   };
 }
 
@@ -26,6 +27,9 @@ export function createMockPrisma() {
     auditLog: createModelMock(),
     deletionRequest: createModelMock(),
     partner: createModelMock(),
+    apiUsageLog: createModelMock(),
+    rateLimit: createModelMock(),
+    $queryRaw: vi.fn(),
   };
 }
 

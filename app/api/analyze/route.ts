@@ -2,11 +2,20 @@ import { NextResponse } from 'next/server';
 import { getOpenAI } from '@/lib/openai';
 import { buildPrompt } from '@/lib/prompts';
 import { FormData } from '@/lib/types';
+import { checkBudget, logUsage } from '@/lib/usage';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 const VALID_SPECIALTIES = ['nhi', 'da-lieu', 'sinh-san', 'std-sti', 'tieu-hoa'];
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 10 requests per minute per IP
+    const ip = getClientIp(request);
+    const rl = await checkRateLimit(`analyze:${ip}`, 10, 60_000);
+    if (!rl.allowed) {
+      return rateLimitResponse(rl, 10);
+    }
+
     const body = await request.json();
     const { specialty, formData } = body as {
       specialty: string;
@@ -20,14 +29,25 @@ export async function POST(request: Request) {
       );
     }
 
+    // Budget check before calling OpenAI
+    const budget = await checkBudget();
+    if (!budget.allowed) {
+      return NextResponse.json(
+        { error: budget.message },
+        { status: 503 }
+      );
+    }
+
     const prompt = buildPrompt(specialty, formData);
 
+    const startTime = Date.now();
     const completion = await getOpenAI().chat.completions.create({
       model: 'gpt-4o',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 3500,
       temperature: 0.3,
     });
+    const durationMs = Date.now() - startTime;
 
     const responseText = completion.choices[0]?.message?.content || '';
 
@@ -59,12 +79,38 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({
+    // Log usage (non-critical)
+    const usage = completion.usage;
+    if (usage) {
+      try {
+        await logUsage({
+          promptTokens: usage.prompt_tokens,
+          completionTokens: usage.completion_tokens,
+          totalTokens: usage.total_tokens,
+          specialty,
+          sessionId,
+          durationMs,
+        });
+      } catch (logError) {
+        console.error('Usage logging failed (non-critical):', logError);
+      }
+    }
+
+    const response: Record<string, unknown> = {
       displayContent,
       recommendedSpecialties,
       redFlags,
       sessionId,
-    });
+    };
+
+    if (budget.budgetWarning) {
+      response.budgetWarning = budget.message;
+    }
+
+    const res = NextResponse.json(response);
+    res.headers.set('X-RateLimit-Limit', '10');
+    res.headers.set('X-RateLimit-Remaining', rl.remaining.toString());
+    return res;
   } catch (error) {
     console.error('Analyze API error:', error);
     return NextResponse.json(
