@@ -161,8 +161,13 @@ export default function PatientConsentPage({
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm max-w-md w-full overflow-hidden">
         {/* Header */}
         <div className="bg-blue-600 text-white px-6 py-4">
-          <h1 className="text-lg font-bold">Chia sẻ thông tin khám bệnh</h1>
-          <p className="text-sm text-blue-100 mt-1">Hello Bác Sĩ</p>
+          <div className="flex items-center gap-3">
+            <img src="/logo.jpeg" alt="Hello Health Group" className="h-9 rounded" />
+            <div>
+              <h1 className="text-lg font-bold">Chia sẻ thông tin khám bệnh</h1>
+              <p className="text-sm text-blue-100 mt-1">Hello Bác Sĩ</p>
+            </div>
+          </div>
         </div>
 
         <div className="p-6 space-y-5">

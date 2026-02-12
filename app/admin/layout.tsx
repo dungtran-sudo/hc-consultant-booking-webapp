@@ -82,8 +82,13 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         {/* Sidebar - desktop */}
         <aside className="hidden md:flex md:flex-col md:w-56 bg-white border-r border-gray-200 fixed h-full">
           <div className="px-4 py-5 border-b border-gray-200">
-            <h1 className="text-lg font-bold text-gray-900">HHG Internal</h1>
-            <p className="text-xs text-gray-500">Quản trị</p>
+            <div className="flex items-center gap-2">
+              <img src="/logo.jpeg" alt="Hello Health Group" className="h-8" />
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">HHG Internal</h1>
+                <p className="text-xs text-gray-500">Quản trị</p>
+              </div>
+            </div>
           </div>
           <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
             {NAV_ITEMS.map((item) => (
@@ -120,7 +125,10 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         {/* Mobile header */}
         <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40">
           <div className="flex items-center justify-between px-4 py-3">
-            <h1 className="text-lg font-bold text-gray-900">HHG Internal</h1>
+            <div className="flex items-center gap-2">
+              <img src="/logo.jpeg" alt="Hello Health Group" className="h-7" />
+              <span className="text-lg font-bold text-gray-900">HHG Internal</span>
+            </div>
             <button
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
               className="p-2 text-gray-600 hover:text-gray-900"

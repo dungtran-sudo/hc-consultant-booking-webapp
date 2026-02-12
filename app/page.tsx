@@ -7,6 +7,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-4xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
+          <img src="/logo.jpeg" alt="Hello Health Group" className="h-16 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Hệ thống Tư vấn Y tế
           </h1>

@@ -46,6 +46,7 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 max-w-md w-full">
+        <img src="/logo.jpeg" alt="Hello Health Group" className="h-14 mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">
           HHG Internal
         </h1>

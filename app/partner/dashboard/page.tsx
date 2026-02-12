@@ -204,11 +204,14 @@ export default function PartnerDashboardPage() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-blue-600 text-white px-6 py-4">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-lg font-bold">HelloBacsi Booking - Portal Đối Tác</h1>
-            {partnerName && (
-              <p className="text-sm text-blue-100">{partnerName}</p>
-            )}
+          <div className="flex items-center gap-3">
+            <img src="/logo.jpeg" alt="Hello Health Group" className="h-9 rounded" />
+            <div>
+              <h1 className="text-lg font-bold">Portal Đối Tác</h1>
+              {partnerName && (
+                <p className="text-sm text-blue-100">{partnerName}</p>
+              )}
+            </div>
           </div>
           <button
             onClick={handleLogout}
