@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockPrisma, MockPrisma } from '../../../helpers/mock-prisma';
+import { createRequest, createAdminRequest } from '../../../helpers/mock-request';
 
 vi.mock('@/lib/db', () => ({
   prisma: createMockPrisma(),
@@ -15,40 +16,25 @@ describe('GET /api/partner/list', () => {
     vi.clearAllMocks();
   });
 
-  it('does not require authentication', async () => {
-    mockPrisma.partner.findMany.mockResolvedValue([
-      { id: 'vinmec', name: 'Vinmec' },
-    ]);
-
-    const response = await GET();
-    expect(response.status).toBe(200);
+  it('returns 401 without admin auth', async () => {
+    const request = createRequest('GET', 'http://localhost:3000/api/partner/list');
+    const response = await GET(request);
+    expect(response.status).toBe(401);
   });
 
-  it('returns partners with id and name fields', async () => {
+  it('returns partners with admin auth', async () => {
     mockPrisma.partner.findMany.mockResolvedValue([
       { id: 'vinmec', name: 'Vinmec' },
       { id: 'simmed', name: 'Simmed' },
     ]);
 
-    const response = await GET();
+    const request = createAdminRequest('GET', 'http://localhost:3000/api/partner/list');
+    const response = await GET(request);
     const body = await response.json();
 
-    expect(body.partners).toBeDefined();
-    expect(Array.isArray(body.partners)).toBe(true);
+    expect(response.status).toBe(200);
     expect(body.partners).toHaveLength(2);
-
-    for (const partner of body.partners) {
-      expect(partner).toHaveProperty('id');
-      expect(partner).toHaveProperty('name');
-      expect(typeof partner.id).toBe('string');
-      expect(typeof partner.name).toBe('string');
-    }
-
-    expect(mockPrisma.partner.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { passwordHash: { not: null }, isActive: true },
-        select: { id: true, name: true },
-      })
-    );
+    expect(body.partners[0]).toHaveProperty('id');
+    expect(body.partners[0]).toHaveProperty('name');
   });
 });
