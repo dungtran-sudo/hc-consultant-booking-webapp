@@ -40,7 +40,7 @@ export async function sendBookingEmail(
           <table border="0" cellpadding="10" cellspacing="0" style="border-collapse: collapse; width: 100%;">
             <tr style="border-bottom: 1px solid #e5e7eb;">
               <td style="color: #6b7280; width: 160px;"><strong>Mã đặt lịch</strong></td>
-              <td><strong>#${data.bookingNumber}</strong></td>
+              <td><strong>${data.bookingNumber}</strong></td>
             </tr>
             <tr style="border-bottom: 1px solid #e5e7eb;">
               <td style="color: #6b7280;"><strong>Dịch vụ</strong></td>
