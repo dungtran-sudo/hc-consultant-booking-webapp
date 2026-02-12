@@ -8,6 +8,9 @@ import { BookingPayload } from '@/lib/types';
 import { getSessionStaff } from '@/lib/staff-auth';
 import { sanitizeText } from '@/lib/sanitize';
 import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('booking');
 
 export async function POST(request: Request) {
   try {
@@ -145,7 +148,7 @@ export async function POST(request: Request) {
         data: { bookingId: booking.id },
       }).catch(() => {
         // Non-critical: log but don't fail the booking
-        console.warn('Failed to link consent token to booking');
+        log.warn('Failed to link consent token to booking');
       });
     }
 
@@ -166,7 +169,7 @@ export async function POST(request: Request) {
           partnerId: payload.partnerId,
         });
       } catch (emailError) {
-        console.warn('Email send failed (non-critical):', emailError);
+        log.warn('Email send failed (non-critical)', { error: String(emailError) });
       }
     }
 
@@ -175,10 +178,9 @@ export async function POST(request: Request) {
       bookingNumber: booking.bookingNumber,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    console.error('Booking API error:', msg, error);
+    log.error('Booking API error', error);
     return NextResponse.json(
-      { error: `Lỗi đặt lịch: ${msg}` },
+      { error: 'Lỗi đặt lịch. Vui lòng thử lại.' },
       { status: 500 }
     );
   }

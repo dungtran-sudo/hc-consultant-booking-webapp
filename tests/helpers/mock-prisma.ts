@@ -18,7 +18,7 @@ function createModelMock() {
 }
 
 export function createMockPrisma() {
-  return {
+  const mock = {
     booking: createModelMock(),
     consent: createModelMock(),
     consentToken: createModelMock(),
@@ -30,7 +30,14 @@ export function createMockPrisma() {
     apiUsageLog: createModelMock(),
     rateLimit: createModelMock(),
     $queryRaw: vi.fn(),
+    $transaction: vi.fn(),
   };
+  // Default: execute interactive transaction callback with mock as tx
+  mock.$transaction.mockImplementation(async (fn: unknown) => {
+    if (typeof fn === 'function') return fn(mock);
+    return Promise.all(fn as Promise<unknown>[]);
+  });
+  return mock;
 }
 
 export type MockPrisma = ReturnType<typeof createMockPrisma>;

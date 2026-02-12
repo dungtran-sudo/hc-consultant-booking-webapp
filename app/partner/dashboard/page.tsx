@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import PIIConsentGate from '@/components/PIIConsentGate';
-import { MaskedBooking, RevealedPII } from '@/lib/types';
+import { RevealedPII } from '@/lib/types';
+import { usePartnerBookings } from '@/lib/hooks/use-partner-bookings';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Tất cả' },
@@ -53,11 +54,13 @@ function formatDate(iso: string): string {
 
 export default function PartnerDashboardPage() {
   const router = useRouter();
-  const [bookings, setBookings] = useState<MaskedBooking[]>([]);
-  const [partnerName, setPartnerName] = useState('');
-  const [partnerId, setPartnerId] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [localError, setLocalError] = useState('');
   const [revealedPII, setRevealedPII] = useState<Record<string, RevealedPII | null>>({});
   const [revealingId, setRevealingId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -70,55 +73,32 @@ export default function PartnerDashboardPage() {
   const [showPIIGate, setShowPIIGate] = useState(false);
   const [pendingRevealId, setPendingRevealId] = useState<string | null>(null);
 
-  // Pagination & filters
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [statusFilter, setStatusFilter] = useState('');
-  const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
-  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({
-    pending: 0, confirmed: 0, completed: 0, cancelled: 0,
-  });
+  const {
+    bookings,
+    partnerName,
+    partnerId,
+    total,
+    totalPages,
+    statusCounts,
+    isLoading: loading,
+    error: swrError,
+    mutate,
+  } = usePartnerBookings({ page, status: statusFilter, search, dateFrom, dateTo });
 
-  const fetchBookings = useCallback(async () => {
-    setLoading(true);
-    setError('');
-    const params = new URLSearchParams({ page: String(page), limit: '20' });
-    if (statusFilter) params.set('status', statusFilter);
-    if (search) params.set('search', search);
-    if (dateFrom) params.set('dateFrom', dateFrom);
-    if (dateTo) params.set('dateTo', dateTo);
+  const error = localError || (swrError ? 'Lỗi khi tải dữ liệu' : '');
 
-    try {
-      const r = await fetch(`/api/partner/bookings?${params}`);
-      if (r.status === 401) {
-        const savedPartnerId = localStorage.getItem('partnerId');
-        router.push(savedPartnerId ? `/partner/login/${savedPartnerId}` : '/partner/login');
-        return;
-      }
-      const data = await r.json();
-      setBookings(data.bookings || []);
-      setPartnerName(data.partnerName || '');
-      if (data.partnerId) {
-        setPartnerId(data.partnerId);
-        localStorage.setItem('partnerId', data.partnerId);
-      }
-      setTotal(data.total || 0);
-      setTotalPages(data.totalPages || 1);
-      if (data.statusCounts) setStatusCounts(data.statusCounts);
-    } catch {
-      setError('Lỗi khi tải dữ liệu');
-    } finally {
-      setLoading(false);
-    }
-  }, [router, page, statusFilter, search, dateFrom, dateTo]);
-
+  // Handle 401 redirect from SWR error
   useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
+    if (swrError && (swrError as Error & { status?: number }).status === 401) {
+      const savedPartnerId = localStorage.getItem('partnerId');
+      router.push(savedPartnerId ? `/partner/login/${savedPartnerId}` : '/partner/login');
+    }
+  }, [swrError, router]);
+
+  // Persist partnerId to localStorage
+  useEffect(() => {
+    if (partnerId) localStorage.setItem('partnerId', partnerId);
+  }, [partnerId]);
 
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,7 +144,7 @@ export default function PartnerDashboardPage() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || 'Lỗi khi tải chi tiết');
+        setLocalError(data.error || 'Lỗi khi tải chi tiết');
         return;
       }
 
@@ -184,7 +164,7 @@ export default function PartnerDashboardPage() {
         }));
       }
     } catch {
-      setError('Lỗi khi tải chi tiết');
+      setLocalError('Lỗi khi tải chi tiết');
     } finally {
       setRevealingId(null);
     }
@@ -199,16 +179,13 @@ export default function PartnerDashboardPage() {
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.ok) {
-        setBookings((prev) =>
-          prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b))
-        );
-        fetchBookings();
+        mutate();
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || 'Lỗi khi cập nhật trạng thái');
+        setLocalError(data.error || 'Lỗi khi cập nhật trạng thái');
       }
     } catch {
-      setError('Lỗi khi cập nhật');
+      setLocalError('Lỗi khi cập nhật');
     } finally {
       setUpdatingId(null);
     }

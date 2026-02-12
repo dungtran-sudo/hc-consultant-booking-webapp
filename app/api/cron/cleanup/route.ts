@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { revokeEncKey } from '@/lib/crypto';
+import { createLogger, safeErrorMessage } from '@/lib/logger';
+
+const log = createLogger('cron-cleanup');
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
@@ -24,35 +27,34 @@ export async function GET(request: Request) {
     // Group by phoneHash
     const phoneHashes = [...new Set(expired.map((b) => b.phoneHash))];
 
-    for (const ph of phoneHashes) {
-      // Check if ALL bookings for this phone are expired
-      const activeCount = await prisma.booking.count({
-        where: {
-          phoneHash: ph,
-          isDeleted: false,
-          expiresAt: { gt: now },
-        },
-      });
-
-      if (activeCount === 0) {
-        await revokeEncKey(ph);
-
-        await prisma.consent.updateMany({
-          where: { phoneHash: ph },
-          data: { phoneHash: 'ANONYMIZED' },
+    await prisma.$transaction(async (tx) => {
+      for (const ph of phoneHashes) {
+        const activeCount = await tx.booking.count({
+          where: {
+            phoneHash: ph,
+            isDeleted: false,
+            expiresAt: { gt: now },
+          },
         });
 
-        // Clean up consent tokens for this phone
-        await prisma.consentToken.deleteMany({
-          where: { phoneHash: ph },
-        });
+        if (activeCount === 0) {
+          await revokeEncKey(ph);
 
-        // Delete encryption key record (already revoked above)
-        await prisma.encryptionKey.deleteMany({
-          where: { phoneHash: ph },
-        });
+          await tx.consent.updateMany({
+            where: { phoneHash: ph },
+            data: { phoneHash: 'ANONYMIZED' },
+          });
+
+          await tx.consentToken.deleteMany({
+            where: { phoneHash: ph },
+          });
+
+          await tx.encryptionKey.deleteMany({
+            where: { phoneHash: ph },
+          });
+        }
       }
-    }
+    });
 
     // Mark expired bookings as deleted
     await prisma.booking.updateMany({
@@ -93,9 +95,9 @@ export async function GET(request: Request) {
       rateLimitsDeleted: deletedRateLimits.count,
     });
   } catch (error) {
-    console.error('Cleanup cron error:', error);
+    log.error('Cleanup cron failed', error);
     return NextResponse.json(
-      { error: 'Cleanup failed' },
+      { error: safeErrorMessage(error, 'Cleanup failed') },
       { status: 500 }
     );
   }

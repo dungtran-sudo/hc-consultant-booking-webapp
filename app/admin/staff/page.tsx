@@ -1,16 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useAdminAuth } from '../context';
-
-interface StaffMember {
-  id: string;
-  name: string;
-  email: string | null;
-  role: string;
-  isActive: boolean;
-  createdAt: string;
-}
+import { useAdminStaff, StaffMember } from '@/lib/hooks/use-admin-staff';
 
 const ROLE_LABELS: Record<string, string> = {
   cs: 'CS',
@@ -38,8 +30,7 @@ function formatDate(iso: string): string {
 
 export default function AdminStaffPage() {
   const { secret } = useAdminAuth();
-  const [staff, setStaff] = useState<StaffMember[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { staff, isLoading: loading, mutate: refreshStaff } = useAdminStaff(secret);
   const [showForm, setShowForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
@@ -49,26 +40,6 @@ export default function AdminStaffPage() {
   const [error, setError] = useState('');
   const [resetId, setResetId] = useState<string | null>(null);
   const [resetPassword, setResetPassword] = useState('');
-
-  const fetchStaff = useCallback(async () => {
-    if (!secret) return;
-    setLoading(true);
-    try {
-      const res = await fetch('/api/admin/staff', {
-        headers: { Authorization: `Bearer ${secret}` },
-      });
-      const data = await res.json();
-      setStaff(data.staff || []);
-    } catch {
-      setStaff([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [secret]);
-
-  useEffect(() => {
-    fetchStaff();
-  }, [fetchStaff]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +73,7 @@ export default function AdminStaffPage() {
       setNewPassword('');
       setNewRole('cs');
       setShowForm(false);
-      fetchStaff();
+      refreshStaff();
     } catch {
       setError('Lỗi kết nối');
     } finally {
@@ -119,7 +90,7 @@ export default function AdminStaffPage() {
       },
       body: JSON.stringify({ isActive: !isActive }),
     });
-    fetchStaff();
+    refreshStaff();
   };
 
   const handleResetPassword = async () => {

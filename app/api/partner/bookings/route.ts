@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { getSessionPartnerId, getPartnerName } from '@/lib/partner-auth';
 import { prisma } from '@/lib/db';
 import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('partner-bookings');
 
 export async function GET(request: Request) {
   // Rate limit: 60 requests per minute per IP
@@ -111,7 +114,7 @@ export async function GET(request: Request) {
       statusCounts,
     });
   } catch (error) {
-    console.error('Error reading bookings:', error);
+    log.error('Error reading bookings', error);
     return NextResponse.json(
       { error: 'Lỗi khi đọc dữ liệu' },
       { status: 500 }

@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { validateAdminAuth } from '@/lib/admin-auth';
-import { getPartnerName } from '@/lib/partner-auth';
+import { createLogger, safeErrorMessage } from '@/lib/logger';
+
+const log = createLogger('admin-bookings');
 
 export async function GET(request: Request) {
   if (!validateAdminAuth(request)) {
@@ -65,15 +67,23 @@ export async function GET(request: Request) {
       prisma.booking.count({ where }),
     ]);
 
-    const enrichedBookings = await Promise.all(
-      bookings.map(async (b) => ({
-        ...b,
-        partnerName: b.partnerName || (await getPartnerName(b.partnerId)),
-        createdAt: b.createdAt.toISOString(),
-        confirmedAt: b.confirmedAt?.toISOString() || null,
-        completedAt: b.completedAt?.toISOString() || null,
-      }))
-    );
+    const missingNameIds = [...new Set(bookings.filter(b => !b.partnerName).map(b => b.partnerId))];
+    const partnerNameMap = new Map<string, string>();
+    if (missingNameIds.length > 0) {
+      const partners = await prisma.partner.findMany({
+        where: { id: { in: missingNameIds } },
+        select: { id: true, name: true },
+      });
+      for (const p of partners) partnerNameMap.set(p.id, p.name);
+    }
+
+    const enrichedBookings = bookings.map((b) => ({
+      ...b,
+      partnerName: b.partnerName || partnerNameMap.get(b.partnerId) || b.partnerId,
+      createdAt: b.createdAt.toISOString(),
+      confirmedAt: b.confirmedAt?.toISOString() || null,
+      completedAt: b.completedAt?.toISOString() || null,
+    }));
 
     return NextResponse.json({
       bookings: enrichedBookings,
@@ -82,7 +92,7 @@ export async function GET(request: Request) {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    console.error('Admin bookings error:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    log.error('Failed to fetch admin bookings', error);
+    return NextResponse.json({ error: safeErrorMessage(error, 'Lỗi server') }, { status: 500 });
   }
 }

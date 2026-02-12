@@ -5,6 +5,9 @@ import { FormData } from '@/lib/types';
 import { reserveBudgetSlot, finalizeBudgetSlot, cancelBudgetSlot } from '@/lib/usage';
 import { sanitizeFormData } from '@/lib/sanitize';
 import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('analyze');
 
 const VALID_SPECIALTIES = ['nhi', 'da-lieu', 'sinh-san', 'std-sti', 'tieu-hoa', 'tim-mach', 'co-xuong-khop', 'tai-mui-hong', 'mat', 'nam-khoa', 'tiem-chung', 'xet-nghiem'];
 
@@ -123,7 +126,7 @@ export async function POST(request: Request) {
     res.headers.set('X-RateLimit-Remaining', rl.remaining.toString());
     return res;
   } catch (error) {
-    console.error('Analyze API error:', error);
+    log.error('Analyze API error', error);
     return NextResponse.json(
       { error: 'Có lỗi xảy ra khi phân tích. Vui lòng thử lại.' },
       { status: 500 }

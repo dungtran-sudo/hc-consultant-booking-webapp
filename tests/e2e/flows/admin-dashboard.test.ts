@@ -48,6 +48,10 @@ describe('Admin Dashboard Flow', () => {
         { partnerId: 'simmed', _count: 5 },
       ]);
 
+    mockPrisma.partner.findMany.mockResolvedValueOnce([
+      { id: 'vinmec', name: 'Vinmec' },
+      { id: 'simmed', name: 'SimMed' },
+    ]);
     mockPrisma.consent.count.mockResolvedValueOnce(30);
     mockPrisma.auditLog.count.mockResolvedValueOnce(200);
 

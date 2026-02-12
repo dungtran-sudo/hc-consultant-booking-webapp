@@ -9,6 +9,7 @@ import BookingModal from '@/components/BookingModal';
 import PartnerSearch from '@/components/PartnerSearch';
 import specialtiesData from '@/data/specialties.json';
 import StaffAuthGate from '@/components/StaffAuthGate';
+import { usePartnerFilter } from '@/lib/hooks/use-partners';
 import {
   Specialty,
   Partner,
@@ -39,7 +40,8 @@ export default function ConsultPage({
 
   const [formData, setFormData] = useState<FormData>(emptyFormData);
   const [result, setResult] = useState<AnalysisResultType | null>(null);
-  const [partners, setPartners] = useState<Partner[]>([]);
+  const [filterSpecialties, setFilterSpecialties] = useState<string[]>([]);
+  const [filterCity, setFilterCity] = useState('');
   const [bookingPartner, setBookingPartner] = useState<{
     partner: Partner;
     service?: Service;
@@ -47,22 +49,17 @@ export default function ConsultPage({
 
   const resultRef = useRef<HTMLDivElement>(null);
 
-  const handleResult = async (data: AnalysisResultType) => {
+  // SWR-cached partner filter (triggers when filterSpecialties is set)
+  const { partners: allFilteredPartners } = usePartnerFilter(filterSpecialties, filterCity);
+  const partners = allFilteredPartners.slice(0, 5);
+
+  const handleResult = (data: AnalysisResultType) => {
     setResult(data);
     const effectiveCity = formData.khuVuc === 'Tỉnh khác' && formData.khuVucKhac?.trim()
       ? formData.khuVucKhac.trim()
       : formData.khuVuc;
-    try {
-      const res = await fetch(
-        `/api/partners/filter?specialties=${encodeURIComponent(data.recommendedSpecialties.join(','))}&city=${encodeURIComponent(effectiveCity)}`
-      );
-      if (res.ok) {
-        const json = await res.json();
-        setPartners(json.partners.slice(0, 5));
-      }
-    } catch {
-      // Silently fail - partners section will show empty
-    }
+    setFilterSpecialties(data.recommendedSpecialties);
+    setFilterCity(effectiveCity);
   };
 
   useEffect(() => {

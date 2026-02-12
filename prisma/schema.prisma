@@ -49,6 +49,9 @@ model Booking {
   @@index([partnerId])
   @@index([expiresAt])
   @@index([status])
+  @@index([partnerId, createdAt])
+  @@index([isDeleted, status])
+  @@index([isDeleted, expiresAt])
   @@map("bookings")
 }
 
@@ -75,6 +78,7 @@ model AuditLog {
   @@index([actorId])
   @@index([bookingId])
   @@index([createdAt])
+  @@index([createdAt, actorType])
   @@map("audit_logs")
 }
 
@@ -151,6 +155,7 @@ model Partner {
   branches PartnerBranch[]
   services PartnerService[]
 
+  @@index([city])
   @@map("partners")
 }
 
@@ -202,6 +207,7 @@ model ApiUsageLog {
 
   @@index([createdAt])
   @@index([specialty])
+  @@index([createdAt, specialty])
   @@map("api_usage_logs")
 }
 

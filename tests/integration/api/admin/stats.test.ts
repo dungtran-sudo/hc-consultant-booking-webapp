@@ -43,6 +43,10 @@ describe('GET /api/admin/stats', () => {
         { partnerId: 'simmed', _count: 3 },
       ]);
 
+    mockPrisma.partner.findMany.mockResolvedValueOnce([
+      { id: 'vinmec', name: 'Vinmec' },
+      { id: 'simmed', name: 'SimMed' },
+    ]);
     mockPrisma.consent.count.mockResolvedValueOnce(25);
     mockPrisma.auditLog.count.mockResolvedValueOnce(100);
 

@@ -1,30 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAdminAuth } from '../context';
-
-interface FieldConfig {
-  id: string;
-  label: string;
-  type: string;
-  required: boolean;
-  placeholder?: string;
-  options?: string[];
-  rows?: number;
-  step?: string;
-  gridCol?: number;
-}
-
-interface SpecialtyFieldGroup {
-  specialtyId: string;
-  sectionTitle: string;
-  fields: FieldConfig[];
-}
-
-interface FormConfig {
-  commonFields: FieldConfig[];
-  specialtyFields: SpecialtyFieldGroup[];
-}
+import { useAdminFormConfig, FieldConfig, FormConfig } from '@/lib/hooks/use-admin-form-config';
 
 const FIELD_TYPES = ['text', 'number', 'select', 'textarea', 'checkbox-group'];
 
@@ -221,24 +199,20 @@ function FieldCard({
 
 export default function AdminFormConfigPage() {
   const { secret } = useAdminAuth();
+  const { config: fetchedConfig, isLoading, mutate: refreshConfig } = useAdminFormConfig(secret);
   const [config, setConfig] = useState<FormConfig | null>(null);
+  const [configInitialized, setConfigInitialized] = useState(false);
   const [activeTab, setActiveTab] = useState('common');
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
-  useEffect(() => {
-    fetch('/api/admin/form-config', {
-      headers: { Authorization: `Bearer ${secret}` },
-    })
-      .then((r) => {
-        if (!r.ok) throw new Error('Unauthorized');
-        return r.json();
-      })
-      .then(setConfig)
-      .catch(() => setConfig(null));
-  }, [secret]);
+  // Sync fetched config into local state for editing (only once)
+  if (fetchedConfig && !configInitialized) {
+    setConfig(fetchedConfig);
+    setConfigInitialized(true);
+  }
 
-  if (!config) {
+  if (isLoading || !config) {
     return (
       <div className="flex items-center justify-center py-20">
         <p className="text-gray-500">Đang tải...</p>
@@ -312,6 +286,7 @@ export default function AdminFormConfigPage() {
         throw new Error(data.error || 'Save failed');
       }
       setSaveMessage('Đã lưu thành công');
+      refreshConfig();
     } catch (err) {
       setSaveMessage(err instanceof Error ? err.message : 'Lỗi khi lưu');
     } finally {

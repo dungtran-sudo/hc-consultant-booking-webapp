@@ -53,6 +53,8 @@ describe('GET /api/cron/cleanup', () => {
     mockPrisma.booking.count.mockResolvedValue(0);
 
     mockPrisma.consent.updateMany.mockResolvedValue({ count: 1 });
+    mockPrisma.consentToken.deleteMany.mockResolvedValue({ count: 1 });
+    mockPrisma.encryptionKey.deleteMany.mockResolvedValue({ count: 1 });
     mockPrisma.booking.updateMany.mockResolvedValue({ count: 3 });
     mockPrisma.apiUsageLog.deleteMany.mockResolvedValueOnce({ count: 2 });
     mockPrisma.rateLimit.deleteMany.mockResolvedValueOnce({ count: 5 });

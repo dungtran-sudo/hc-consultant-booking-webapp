@@ -1,42 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useAdminAuth } from './context';
-
-interface UsageStats {
-  daily: {
-    cost: number;
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-    callCount: number;
-    budget: number;
-    utilizationPercent: number;
-  };
-  monthly: {
-    cost: number;
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-    callCount: number;
-    budget: number;
-    utilizationPercent: number;
-  };
-  bySpecialty: {
-    month: { specialty: string; count: number; cost: number }[];
-    today: { specialty: string; count: number; cost: number }[];
-  };
-}
-
-interface AdminStats {
-  totalActive: number;
-  totalDeleted: number;
-  statusCounts: Record<string, number>;
-  partnerStats: { partnerId: string; partnerName: string; count: number }[];
-  recentCount: number;
-  totalConsents: number;
-  totalAuditLogs: number;
-}
+import { useAdminStats } from '@/lib/hooks/use-admin-stats';
 
 function StatCard({
   label,
@@ -100,36 +65,9 @@ function UsageBudgetBar({
 
 export default function AdminDashboardPage() {
   const { secret } = useAdminAuth();
-  const [stats, setStats] = useState<AdminStats | null>(null);
-  const [usageStats, setUsageStats] = useState<UsageStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { stats, usageStats, isLoading, error } = useAdminStats(secret);
 
-  useEffect(() => {
-    if (!secret) return;
-    Promise.all([
-      fetch('/api/admin/stats', {
-        headers: { Authorization: `Bearer ${secret}` },
-      }).then((r) => {
-        if (!r.ok) throw new Error('Failed to load stats');
-        return r.json();
-      }),
-      fetch('/api/admin/usage-stats', {
-        headers: { Authorization: `Bearer ${secret}` },
-      }).then((r) => {
-        if (!r.ok) return null;
-        return r.json();
-      }),
-    ])
-      .then(([statsData, usageData]) => {
-        setStats(statsData);
-        setUsageStats(usageData);
-      })
-      .catch(() => setError('Lỗi khi tải dữ liệu'))
-      .finally(() => setLoading(false));
-  }, [secret]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <p className="text-gray-500">Đang tải...</p>
@@ -140,7 +78,7 @@ export default function AdminDashboardPage() {
   if (error || !stats) {
     return (
       <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-        {error || 'Lỗi khi tải dữ liệu'}
+        Lỗi khi tải dữ liệu
       </div>
     );
   }

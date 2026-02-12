@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useAdminAuth } from '../context';
-import { MaskedBooking, RevealedPII } from '@/lib/types';
+import { RevealedPII } from '@/lib/types';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import PIIConsentGate from '@/components/PIIConsentGate';
+import { useAdminBookings } from '@/lib/hooks/use-admin-bookings';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Tất cả' },
@@ -45,11 +46,7 @@ function formatDate(iso: string): string {
 
 export default function AdminBookingsPage() {
   const { secret } = useAdminAuth();
-  const [bookings, setBookings] = useState<MaskedBooking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [partnerFilter, setPartnerFilter] = useState('');
@@ -65,37 +62,14 @@ export default function AdminBookingsPage() {
   const [showPIIGate, setShowPIIGate] = useState(false);
   const [pendingRevealId, setPendingRevealId] = useState<string | null>(null);
 
-  const fetchBookings = useCallback(async () => {
-    if (!secret) return;
-    setLoading(true);
-    const params = new URLSearchParams({ page: String(page), limit: '20' });
-    if (search) params.set('search', search);
-    if (statusFilter) params.set('status', statusFilter);
-    if (partnerFilter) params.set('partner', partnerFilter);
-
-    try {
-      const res = await fetch(`/api/admin/bookings?${params}`, {
-        headers: { Authorization: `Bearer ${secret}` },
-      });
-      const data = await res.json();
-      setBookings(data.bookings || []);
-      setTotal(data.total || 0);
-      setTotalPages(data.totalPages || 1);
-    } catch {
-      setBookings([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [secret, page, search, statusFilter, partnerFilter]);
-
-  useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
+  const { bookings, total, totalPages, isLoading: loading, mutate } = useAdminBookings(
+    secret,
+    { page, search, status: statusFilter, partner: partnerFilter },
+  );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    fetchBookings();
   };
 
   const requestReveal = (bookingId: string) => {
@@ -149,9 +123,7 @@ export default function AdminBookingsPage() {
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.ok) {
-        setBookings((prev) =>
-          prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b))
-        );
+        mutate();
       }
     } catch {
       // ignore

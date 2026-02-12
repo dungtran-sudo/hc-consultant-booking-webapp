@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { validateAdminAuth } from '@/lib/admin-auth';
-import { getPartnerName } from '@/lib/partner-auth';
+import { createLogger, safeErrorMessage } from '@/lib/logger';
+
+const log = createLogger('admin-stats');
 
 export async function GET(request: Request) {
   if (!validateAdminAuth(request)) {
@@ -51,13 +53,18 @@ export async function GET(request: Request) {
       statusCounts[s.status] = s._count;
     }
 
-    const partnerStats = await Promise.all(
-      byPartner.map(async (p) => ({
-        partnerId: p.partnerId,
-        partnerName: await getPartnerName(p.partnerId),
-        count: p._count,
-      }))
-    );
+    const partnerIds = byPartner.map((p) => p.partnerId);
+    const partners = await prisma.partner.findMany({
+      where: { id: { in: partnerIds } },
+      select: { id: true, name: true },
+    });
+    const partnerNameMap = new Map(partners.map((p) => [p.id, p.name]));
+
+    const partnerStats = byPartner.map((p) => ({
+      partnerId: p.partnerId,
+      partnerName: partnerNameMap.get(p.partnerId) || p.partnerId,
+      count: p._count,
+    }));
 
     return NextResponse.json({
       totalActive,
@@ -69,7 +76,7 @@ export async function GET(request: Request) {
       totalAuditLogs,
     });
   } catch (error) {
-    console.error('Admin stats error:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    log.error('Failed to fetch admin stats', error);
+    return NextResponse.json({ error: safeErrorMessage(error, 'Lỗi server') }, { status: 500 });
   }
 }
