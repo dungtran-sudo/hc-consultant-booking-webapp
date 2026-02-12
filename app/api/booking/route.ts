@@ -6,6 +6,7 @@ import { validateConsentHash } from '@/lib/consent';
 import { sendBookingEmail } from '@/lib/mailer';
 import { BookingPayload } from '@/lib/types';
 import { getSessionStaff } from '@/lib/staff-auth';
+import { sanitizeText } from '@/lib/sanitize';
 import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
@@ -17,7 +18,15 @@ export async function POST(request: Request) {
       return rateLimitResponse(rl, 20);
     }
 
-    const payload = (await request.json()) as BookingPayload;
+    const rawPayload = (await request.json()) as BookingPayload;
+    // Sanitize text inputs
+    const payload: BookingPayload = {
+      ...rawPayload,
+      patientName: sanitizeText(rawPayload.patientName || ''),
+      conditionSummary: sanitizeText(rawPayload.conditionSummary || ''),
+      notes: sanitizeText(rawPayload.notes || ''),
+      serviceName: sanitizeText(rawPayload.serviceName || ''),
+    };
 
     // Validate phone number (Vietnamese: 10 digits starting with 0)
     const phoneDigits = (payload.phone || '').replace(/[\s\-\.]/g, '');

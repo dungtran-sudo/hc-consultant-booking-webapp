@@ -110,3 +110,66 @@ export async function logUsage(params: LogUsageParams): Promise<void> {
     },
   });
 }
+
+// Estimated max cost of a single GPT-4o request (~2000 input + 3500 output tokens)
+const RESERVED_COST_USD = calculateCost(2000, 3500);
+
+/**
+ * Reserve a budget slot before calling OpenAI.
+ * Creates a placeholder usage log entry so concurrent requests see the reserved cost.
+ * Returns the reservation ID to finalize or cancel later.
+ */
+export async function reserveBudgetSlot(
+  specialty: string,
+  sessionId: string
+): Promise<{ id: string } | null> {
+  const budget = await checkBudget();
+  if (!budget.allowed) return null;
+
+  const entry = await prisma.apiUsageLog.create({
+    data: {
+      promptTokens: 0,
+      completionTokens: 0,
+      totalTokens: 0,
+      estimatedCostUsd: RESERVED_COST_USD,
+      model: 'gpt-4o',
+      specialty,
+      sessionId,
+      durationMs: 0,
+    },
+  });
+
+  return { id: entry.id };
+}
+
+/**
+ * Finalize a budget reservation with actual usage data.
+ */
+export async function finalizeBudgetSlot(
+  reservationId: string,
+  params: LogUsageParams
+): Promise<void> {
+  const estimatedCostUsd = calculateCost(params.promptTokens, params.completionTokens);
+
+  await prisma.apiUsageLog.update({
+    where: { id: reservationId },
+    data: {
+      promptTokens: params.promptTokens,
+      completionTokens: params.completionTokens,
+      totalTokens: params.totalTokens,
+      estimatedCostUsd,
+      durationMs: params.durationMs,
+    },
+  });
+}
+
+/**
+ * Cancel a budget reservation (e.g., if the OpenAI call fails).
+ */
+export async function cancelBudgetSlot(reservationId: string): Promise<void> {
+  await prisma.apiUsageLog.delete({
+    where: { id: reservationId },
+  }).catch(() => {
+    // Non-critical: if delete fails, the reserved cost remains (conservative)
+  });
+}

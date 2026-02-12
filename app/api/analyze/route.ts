@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { getOpenAI } from '@/lib/openai';
 import { buildPrompt } from '@/lib/prompts';
 import { FormData } from '@/lib/types';
-import { checkBudget, logUsage } from '@/lib/usage';
+import { reserveBudgetSlot, finalizeBudgetSlot, cancelBudgetSlot } from '@/lib/usage';
+import { sanitizeFormData } from '@/lib/sanitize';
 import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 const VALID_SPECIALTIES = ['nhi', 'da-lieu', 'sinh-san', 'std-sti', 'tieu-hoa', 'tim-mach', 'co-xuong-khop', 'tai-mui-hong', 'mat', 'nam-khoa', 'tiem-chung', 'xet-nghiem'];
@@ -17,10 +18,11 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { specialty, formData } = body as {
+    const { specialty, formData: rawFormData } = body as {
       specialty: string;
       formData: FormData;
     };
+    const formData = sanitizeFormData(rawFormData);
 
     if (!VALID_SPECIALTIES.includes(specialty)) {
       return NextResponse.json(
@@ -29,25 +31,51 @@ export async function POST(request: Request) {
       );
     }
 
-    // Budget check before calling OpenAI
-    const budget = await checkBudget();
-    if (!budget.allowed) {
+    const sessionId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+    // Reserve budget slot atomically (prevents concurrent overspend)
+    const reservation = await reserveBudgetSlot(specialty, sessionId);
+    if (!reservation) {
       return NextResponse.json(
-        { error: budget.message },
+        { error: 'Hệ thống tạm ngưng phân tích do đã đạt giới hạn chi phí. Vui lòng thử lại sau.' },
         { status: 503 }
       );
     }
 
     const prompt = buildPrompt(specialty, formData);
 
-    const startTime = Date.now();
-    const completion = await getOpenAI().chat.completions.create({
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 3500,
-      temperature: 0.3,
-    });
-    const durationMs = Date.now() - startTime;
+    let completion;
+    try {
+      const startTime = Date.now();
+      completion = await getOpenAI().chat.completions.create({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 3500,
+        temperature: 0.3,
+      });
+      const durationMs = Date.now() - startTime;
+
+      // Finalize reservation with actual usage
+      const usage = completion.usage;
+      if (usage) {
+        try {
+          await finalizeBudgetSlot(reservation.id, {
+            promptTokens: usage.prompt_tokens,
+            completionTokens: usage.completion_tokens,
+            totalTokens: usage.total_tokens,
+            specialty,
+            sessionId,
+            durationMs,
+          });
+        } catch (logError) {
+          console.error('Usage finalization failed (non-critical):', logError);
+        }
+      }
+    } catch (apiError) {
+      // Cancel reservation if OpenAI call fails
+      await cancelBudgetSlot(reservation.id);
+      throw apiError;
+    }
 
     const responseText = completion.choices[0]?.message?.content || '';
 
@@ -55,7 +83,6 @@ export async function POST(request: Request) {
     let displayContent = responseText;
     let recommendedSpecialties: string[] = [specialty];
     let redFlags: string[] = [];
-    const sessionId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     const metadataMatch = responseText.match(
       /%%JSON_METADATA_START%%([\s\S]*?)%%JSON_METADATA_END%%/
@@ -84,33 +111,12 @@ export async function POST(request: Request) {
       }
     }
 
-    // Log usage (non-critical)
-    const usage = completion.usage;
-    if (usage) {
-      try {
-        await logUsage({
-          promptTokens: usage.prompt_tokens,
-          completionTokens: usage.completion_tokens,
-          totalTokens: usage.total_tokens,
-          specialty,
-          sessionId,
-          durationMs,
-        });
-      } catch (logError) {
-        console.error('Usage logging failed (non-critical):', logError);
-      }
-    }
-
     const response: Record<string, unknown> = {
       displayContent,
       recommendedSpecialties,
       redFlags,
       sessionId,
     };
-
-    if (budget.budgetWarning) {
-      response.budgetWarning = budget.message;
-    }
 
     const res = NextResponse.json(response);
     res.headers.set('X-RateLimit-Limit', '10');
