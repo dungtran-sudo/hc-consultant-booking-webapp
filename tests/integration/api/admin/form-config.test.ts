@@ -20,11 +20,21 @@ describe('GET /api/admin/form-config', () => {
     vi.clearAllMocks();
   });
 
-  it('returns form config from file', async () => {
+  it('returns 401 without admin auth', async () => {
+    const req = createRequest('GET', 'http://localhost:3000/api/admin/form-config');
+    const res = await GET(req);
+
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error).toBe('Unauthorized');
+  });
+
+  it('returns form config from file with admin auth', async () => {
     const mockConfig = { services: ['Kham Nhi', 'Kham Noi'], partners: [] };
     mockReadFileSync.mockReturnValue(JSON.stringify(mockConfig));
 
-    const res = await GET();
+    const req = createAdminRequest('GET', 'http://localhost:3000/api/admin/form-config');
+    const res = await GET(req);
 
     expect(res.status).toBe(200);
     const body = await res.json();

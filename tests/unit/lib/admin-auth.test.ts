@@ -34,4 +34,28 @@ describe('validateAdminAuth', () => {
     });
     expect(validateAdminAuth(request)).toBe(false);
   });
+
+  it('returns false when ADMIN_SECRET is empty', () => {
+    const original = process.env.ADMIN_SECRET;
+    process.env.ADMIN_SECRET = '';
+    const request = new Request('http://localhost:3000/api/admin/test', {
+      headers: {
+        Authorization: 'Bearer ',
+      },
+    });
+    expect(validateAdminAuth(request)).toBe(false);
+    process.env.ADMIN_SECRET = original;
+  });
+
+  it('returns false when ADMIN_SECRET is undefined', () => {
+    const original = process.env.ADMIN_SECRET;
+    delete process.env.ADMIN_SECRET;
+    const request = new Request('http://localhost:3000/api/admin/test', {
+      headers: {
+        Authorization: 'Bearer undefined',
+      },
+    });
+    expect(validateAdminAuth(request)).toBe(false);
+    process.env.ADMIN_SECRET = original;
+  });
 });

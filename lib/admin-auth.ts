@@ -1,4 +1,6 @@
 export function validateAdminAuth(request: Request): boolean {
+  const secret = process.env.ADMIN_SECRET;
+  if (!secret) return false;
   const authHeader = request.headers.get('authorization');
-  return authHeader === `Bearer ${process.env.ADMIN_SECRET}`;
+  return authHeader === `Bearer ${secret}`;
 }

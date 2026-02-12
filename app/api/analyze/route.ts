@@ -68,8 +68,13 @@ export async function POST(request: Request) {
 
       try {
         const metadata = JSON.parse(metadataMatch[1].trim());
-        if (metadata.recommended_specialties) {
-          recommendedSpecialties = metadata.recommended_specialties;
+        if (Array.isArray(metadata.recommended_specialties)) {
+          const validated = metadata.recommended_specialties.filter(
+            (s: unknown) => typeof s === 'string' && VALID_SPECIALTIES.includes(s)
+          );
+          if (validated.length > 0) {
+            recommendedSpecialties = validated;
+          }
         }
         if (metadata.red_flags_present) {
           redFlags = ['red_flags_present'];

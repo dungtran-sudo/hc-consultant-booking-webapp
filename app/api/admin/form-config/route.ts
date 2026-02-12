@@ -5,7 +5,11 @@ import { validateAdminAuth } from '@/lib/admin-auth';
 
 const CONFIG_PATH = path.resolve(process.cwd(), 'data/form-config.json');
 
-export async function GET() {
+export async function GET(request: Request) {
+  if (!validateAdminAuth(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const data = fs.readFileSync(CONFIG_PATH, 'utf-8');
   return NextResponse.json(JSON.parse(data));
 }

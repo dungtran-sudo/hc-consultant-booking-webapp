@@ -4,6 +4,7 @@ import { prisma } from './db';
 import { verifyPassword } from './staff-auth';
 
 const COOKIE_NAME = 'partner_session';
+const TOKEN_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 function getSecret(): string {
   const secret = process.env.PARTNER_SESSION_SECRET;
@@ -13,18 +14,26 @@ function getSecret(): string {
 
 export function createSessionToken(partnerId: string): string {
   const secret = getSecret();
-  const signature = crypto.createHmac('sha256', secret).update(partnerId).digest('hex');
-  return `${partnerId}:${signature}`;
+  const timestamp = Date.now().toString(36);
+  const payload = `${partnerId}:${timestamp}`;
+  const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+  return `${payload}:${signature}`;
 }
 
 export function verifySessionToken(token: string): string | null {
+  const parts = token.split(':');
+  if (parts.length < 3) return null;
+
+  const signature = parts.pop()!;
+  const payload = parts.join(':');
   const secret = getSecret();
-  const colonIndex = token.indexOf(':');
-  if (colonIndex === -1) return null;
-  const partnerId = token.substring(0, colonIndex);
-  const signature = token.substring(colonIndex + 1);
-  const expected = crypto.createHmac('sha256', secret).update(partnerId).digest('hex');
+  const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
   if (signature !== expected) return null;
+
+  const partnerId = parts[0];
+  const timestamp = parseInt(parts[1], 36);
+  if (isNaN(timestamp) || Date.now() - timestamp > TOKEN_MAX_AGE_MS) return null;
+
   return partnerId;
 }
 

@@ -42,11 +42,11 @@ describe('verifyPassword', () => {
 });
 
 describe('createStaffSessionToken', () => {
-  it('returns staffId:role:name:signature format', () => {
+  it('returns staffId:role:name:timestamp:signature format', () => {
     const token = createStaffSessionToken('staff-1', 'Dr. Nguyen', 'admin');
     const parts = token.split(':');
-    // staffId:role:name:signature = 4 parts minimum
-    expect(parts.length).toBeGreaterThanOrEqual(4);
+    // staffId:role:name:timestamp:signature = 5 parts minimum
+    expect(parts.length).toBeGreaterThanOrEqual(5);
     expect(parts[0]).toBe('staff-1');
     expect(parts[1]).toBe('admin');
     expect(parts[2]).toBe('Dr. Nguyen');
@@ -68,13 +68,13 @@ describe('verifyStaffSessionToken', () => {
 
   it('returns null for invalid signature', () => {
     const result = verifyStaffSessionToken(
-      'staff-1:admin:Dr. Nguyen:invalidsignature'
+      'staff-1:admin:Dr. Nguyen:abc:invalidsignature'
     );
     expect(result).toBeNull();
   });
 
   it('returns null for too few parts', () => {
-    const result = verifyStaffSessionToken('staff-1:admin');
+    const result = verifyStaffSessionToken('staff-1:admin:name');
     expect(result).toBeNull();
   });
 
@@ -90,6 +90,16 @@ describe('verifyStaffSessionToken', () => {
       staffName: 'Dr. A: Specialist: Cardio',
       role: 'cs',
     });
+  });
+
+  it('returns null for expired token', () => {
+    const crypto = require('crypto');
+    const secret = process.env.STAFF_SESSION_SECRET!;
+    const oldTimestamp = (Date.now() - 25 * 60 * 60 * 1000).toString(36); // 25 hours ago
+    const payload = `staff-1:admin:Dr. Nguyen:${oldTimestamp}`;
+    const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+    const expiredToken = `${payload}:${signature}`;
+    expect(verifyStaffSessionToken(expiredToken)).toBeNull();
   });
 });
 

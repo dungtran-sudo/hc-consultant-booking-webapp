@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { cookies } from 'next/headers';
 
 const COOKIE_NAME = 'staff_session';
+const TOKEN_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function getSecret(): string {
   const secret = process.env.STAFF_SESSION_SECRET;
@@ -38,7 +39,8 @@ export function createStaffSessionToken(
   role: string
 ): string {
   const secret = getSecret();
-  const payload = `${staffId}:${role}:${name}`;
+  const timestamp = Date.now().toString(36);
+  const payload = `${staffId}:${role}:${name}:${timestamp}`;
   const signature = crypto
     .createHmac('sha256', secret)
     .update(payload)
@@ -50,21 +52,27 @@ export function verifyStaffSessionToken(
   token: string
 ): { staffId: string; staffName: string; role: string } | null {
   const parts = token.split(':');
-  if (parts.length < 4) return null;
+  if (parts.length < 5) return null;
 
   const signature = parts.pop()!;
   const payload = parts.join(':');
-  // Re-split payload: staffId:role:name (name may contain colons)
-  const [staffId, role, ...nameParts] = payload.split(':');
-  const staffName = nameParts.join(':');
 
   const secret = getSecret();
   const expected = crypto
     .createHmac('sha256', secret)
     .update(payload)
     .digest('hex');
-
   if (signature !== expected) return null;
+
+  // Re-split payload: staffId:role:name_parts:timestamp
+  // timestamp is the last segment before signature
+  const timestampStr = parts.pop()!;
+  const [staffId, role, ...nameParts] = parts;
+  const staffName = nameParts.join(':');
+
+  const timestamp = parseInt(timestampStr, 36);
+  if (isNaN(timestamp) || Date.now() - timestamp > TOKEN_MAX_AGE_MS) return null;
+
   return { staffId, staffName, role };
 }
 

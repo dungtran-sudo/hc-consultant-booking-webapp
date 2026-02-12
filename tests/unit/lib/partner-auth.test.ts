@@ -22,19 +22,24 @@ import {
 } from '@/lib/partner-auth';
 
 describe('createSessionToken', () => {
-  it('returns string in format partnerId:signature', () => {
+  it('returns string in format partnerId:timestamp:signature', () => {
     const token = createSessionToken('vinmec');
     const parts = token.split(':');
-    expect(parts).toHaveLength(2);
+    expect(parts).toHaveLength(3);
     expect(parts[0]).toBe('vinmec');
+    // timestamp is base36 encoded
+    expect(parts[1].length).toBeGreaterThan(0);
     // Signature is a hex-encoded HMAC-SHA256 (64 hex chars)
-    expect(parts[1]).toHaveLength(64);
+    expect(parts[2]).toHaveLength(64);
   });
 
-  it('produces deterministic output', () => {
-    const token1 = createSessionToken('vinmec');
-    const token2 = createSessionToken('vinmec');
-    expect(token1).toBe(token2);
+  it('includes timestamp in token', () => {
+    const before = Date.now();
+    const token = createSessionToken('vinmec');
+    const parts = token.split(':');
+    const timestamp = parseInt(parts[1], 36);
+    expect(timestamp).toBeGreaterThanOrEqual(before);
+    expect(timestamp).toBeLessThanOrEqual(Date.now());
   });
 });
 
@@ -46,11 +51,11 @@ describe('verifySessionToken', () => {
   });
 
   it('returns null for invalid signature', () => {
-    const result = verifySessionToken('vinmec:invalidsignature');
+    const result = verifySessionToken('vinmec:abc:invalidsignature');
     expect(result).toBeNull();
   });
 
-  it('returns null for no colon', () => {
+  it('returns null for too few parts', () => {
     const result = verifySessionToken('noColonHere');
     expect(result).toBeNull();
   });
@@ -58,6 +63,17 @@ describe('verifySessionToken', () => {
   it('returns null for empty string', () => {
     const result = verifySessionToken('');
     expect(result).toBeNull();
+  });
+
+  it('returns null for expired token', () => {
+    // Create a token with a very old timestamp
+    const crypto = require('crypto');
+    const secret = process.env.PARTNER_SESSION_SECRET!;
+    const oldTimestamp = (Date.now() - 8 * 24 * 60 * 60 * 1000).toString(36); // 8 days ago
+    const payload = `vinmec:${oldTimestamp}`;
+    const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+    const expiredToken = `${payload}:${signature}`;
+    expect(verifySessionToken(expiredToken)).toBeNull();
   });
 });
 
