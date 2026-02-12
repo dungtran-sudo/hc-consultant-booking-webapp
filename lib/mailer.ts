@@ -52,7 +52,7 @@ export async function sendBookingEmail(
             </tr>
             <tr style="border-bottom: 1px solid #e5e7eb;">
               <td style="color: #6b7280;"><strong>Ngày mong muốn</strong></td>
-              <td>${data.preferredDate}</td>
+              <td>${data.preferredDate?.split('-').reverse().join('/')}</td>
             </tr>
             <tr>
               <td style="color: #6b7280;"><strong>Giờ mong muốn</strong></td>

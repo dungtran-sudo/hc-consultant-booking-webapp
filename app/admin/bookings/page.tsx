@@ -244,7 +244,7 @@ export default function AdminBookingsPage() {
                         {b.partnerName}
                       </td>
                       <td className="px-4 py-3 text-gray-600 hidden md:table-cell whitespace-nowrap">
-                        {b.preferredDate} {b.preferredTime}
+                        {b.preferredDate?.split('-').reverse().join('/')} {b.preferredTime}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">

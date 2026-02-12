@@ -357,7 +357,7 @@ export default function PartnerDashboardPage() {
                             {b.branchAddress}
                           </td>
                           <td className="px-4 py-3 text-gray-600 whitespace-nowrap hidden sm:table-cell">
-                            {b.preferredDate}
+                            {b.preferredDate?.split('-').reverse().join('/')}
                           </td>
                           <td className="px-4 py-3 text-gray-600 whitespace-nowrap hidden sm:table-cell">
                             {b.preferredTime}

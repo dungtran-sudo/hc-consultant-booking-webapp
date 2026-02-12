@@ -49,7 +49,7 @@ export async function appendBookingRow(payload: BookingPayload): Promise<void> {
         payload.serviceName,
         payload.partnerName,
         payload.branchAddress,
-        payload.preferredDate,
+        payload.preferredDate?.split('-').reverse().join('/'),
         payload.preferredTime,
         payload.notes,
       ]],
