@@ -45,8 +45,19 @@ export async function POST(request: Request) {
       data: { phoneHash: 'ANONYMIZED' },
     });
 
+    // Clean up consent tokens for this phone
+    await prisma.consentToken.deleteMany({
+      where: { phoneHash },
+    });
+
+    // Delete encryption key record (already revoked above)
+    await prisma.encryptionKey.deleteMany({
+      where: { phoneHash },
+    });
+
     // Create deletion request record
     const ip =
+      request.headers.get('x-real-ip')?.trim() ||
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       'unknown';
 

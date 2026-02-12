@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server';
 import { getSessionPartnerId, getPartnerName } from '@/lib/partner-auth';
 import { prisma } from '@/lib/db';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function GET(request: Request) {
+  // Rate limit: 60 requests per minute per IP
+  const ip = getClientIp(request);
+  const rl = await checkRateLimit(`partner-bookings:${ip}`, 60, 60_000);
+  if (!rl.allowed) {
+    return rateLimitResponse(rl, 60);
+  }
+
   const partnerId = await getSessionPartnerId();
 
   if (!partnerId) {
@@ -73,6 +81,7 @@ export async function GET(request: Request) {
     }
 
     const ip =
+      request.headers.get('x-real-ip')?.trim() ||
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       'unknown';
 

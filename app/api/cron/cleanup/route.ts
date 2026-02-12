@@ -41,6 +41,16 @@ export async function GET(request: Request) {
           where: { phoneHash: ph },
           data: { phoneHash: 'ANONYMIZED' },
         });
+
+        // Clean up consent tokens for this phone
+        await prisma.consentToken.deleteMany({
+          where: { phoneHash: ph },
+        });
+
+        // Delete encryption key record (already revoked above)
+        await prisma.encryptionKey.deleteMany({
+          where: { phoneHash: ph },
+        });
       }
     }
 

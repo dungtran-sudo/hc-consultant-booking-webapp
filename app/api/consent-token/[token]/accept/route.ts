@@ -33,6 +33,7 @@ export async function POST(
     }
 
     const ip =
+      request.headers.get('x-real-ip')?.trim() ||
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       'unknown';
     const userAgent = request.headers.get('user-agent') || 'unknown';

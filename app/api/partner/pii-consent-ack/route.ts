@@ -12,7 +12,9 @@ export async function POST(request: Request) {
   }
 
   const ip =
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    request.headers.get('x-real-ip')?.trim() ||
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    'unknown';
 
   await prisma.auditLog.create({
     data: {

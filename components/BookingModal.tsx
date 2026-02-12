@@ -57,6 +57,13 @@ export default function BookingModal({
       return;
     }
 
+    // Vietnamese phone number validation: 10 digits starting with 0
+    const phoneDigits = form.phone.replace(/[\s\-\.]/g, '');
+    if (!/^0\d{9}$/.test(phoneDigits)) {
+      setError('Số điện thoại không hợp lệ. Vui lòng nhập 10 chữ số (VD: 0901234567).');
+      return;
+    }
+
     // Create consent token for QR flow
     setCreatingToken(true);
     setError('');

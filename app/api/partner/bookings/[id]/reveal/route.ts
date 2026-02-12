@@ -3,11 +3,19 @@ import { getSessionPartnerId } from '@/lib/partner-auth';
 import { validateAdminAuth } from '@/lib/admin-auth';
 import { prisma } from '@/lib/db';
 import { decryptBookingPII } from '@/lib/crypto';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Rate limit: 30 reveals per minute per IP (strict — PII access)
+  const clientIp = getClientIp(request);
+  const rl = await checkRateLimit(`reveal-pii:${clientIp}`, 30, 60_000);
+  if (!rl.allowed) {
+    return rateLimitResponse(rl, 30);
+  }
+
   const isAdmin = validateAdminAuth(request);
   const partnerId = isAdmin ? null : await getSessionPartnerId();
 
@@ -50,6 +58,7 @@ export async function POST(
     }
 
     const ip =
+      request.headers.get('x-real-ip')?.trim() ||
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       'unknown';
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionPartnerId } from '@/lib/partner-auth';
 import { prisma } from '@/lib/db';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
 const ALLOWED_TRANSITIONS: Record<string, string[]> = {
   pending: ['confirmed', 'cancelled'],
@@ -13,6 +14,13 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Rate limit: 30 status updates per minute per IP
+  const clientIp = getClientIp(request);
+  const rl = await checkRateLimit(`partner-status:${clientIp}`, 30, 60_000);
+  if (!rl.allowed) {
+    return rateLimitResponse(rl, 30);
+  }
+
   const partnerId = await getSessionPartnerId();
 
   if (!partnerId) {
@@ -51,7 +59,9 @@ export async function PATCH(
     await prisma.booking.update({ where: { id }, data: updateData });
 
     const ip =
-      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+      request.headers.get('x-real-ip')?.trim() ||
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      'unknown';
 
     await prisma.auditLog.create({
       data: {

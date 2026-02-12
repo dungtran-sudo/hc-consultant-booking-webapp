@@ -54,8 +54,12 @@ export async function checkRateLimit(
 }
 
 export function getClientIp(request: Request): string {
+  // x-real-ip is set by Vercel's proxy and cannot be spoofed by the client.
+  // x-forwarded-for can be spoofed, so only use as fallback.
   return (
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    request.headers.get('x-real-ip')?.trim() ||
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    'unknown'
   );
 }
 

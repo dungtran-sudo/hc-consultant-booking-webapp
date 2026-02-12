@@ -153,6 +153,11 @@ describe('Staff Consult-to-Booking Flow', () => {
       id: 'bk-new-1',
       bookingNumber: 'HHG-VIN-1234-A1',
     };
+    // Mock consent token validation (new security check)
+    mockPrisma.consentToken.findUnique.mockResolvedValueOnce({
+      status: 'accepted',
+      expiresAt: new Date(Date.now() + 3600_000),
+    });
     mockPrisma.consent.create.mockResolvedValueOnce({});
     mockPrisma.booking.create.mockResolvedValueOnce(createdBooking);
     mockPrisma.auditLog.create.mockResolvedValueOnce({});

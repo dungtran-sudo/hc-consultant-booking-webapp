@@ -19,6 +19,15 @@ export async function POST(request: Request) {
 
     const payload = (await request.json()) as BookingPayload;
 
+    // Validate phone number (Vietnamese: 10 digits starting with 0)
+    const phoneDigits = (payload.phone || '').replace(/[\s\-\.]/g, '');
+    if (!/^0\d{9}$/.test(phoneDigits)) {
+      return NextResponse.json(
+        { error: 'Số điện thoại không hợp lệ.' },
+        { status: 400 }
+      );
+    }
+
     // Validate consent
     if (
       !payload.consentVersion ||
@@ -29,6 +38,28 @@ export async function POST(request: Request) {
         { error: 'Consent không hợp lệ. Vui lòng thử lại.' },
         { status: 400 }
       );
+    }
+
+    // If consent token provided, verify it's valid and not expired
+    if (payload.consentTokenId) {
+      const consentToken = await prisma.consentToken.findUnique({
+        where: { id: payload.consentTokenId },
+        select: { status: true, expiresAt: true },
+      });
+
+      if (!consentToken || consentToken.status !== 'accepted') {
+        return NextResponse.json(
+          { error: 'Consent token không hợp lệ hoặc chưa được chấp nhận.' },
+          { status: 400 }
+        );
+      }
+
+      if (new Date() > consentToken.expiresAt) {
+        return NextResponse.json(
+          { error: 'Consent token đã hết hạn. Vui lòng tạo lại.' },
+          { status: 400 }
+        );
+      }
     }
 
     // Encrypt PII

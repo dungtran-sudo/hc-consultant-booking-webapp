@@ -24,9 +24,9 @@ export async function sendBookingEmail(
 ): Promise<void> {
   const portalUrl =
     process.env.NEXT_PUBLIC_BASE_URL ||
-    process.env.VERCEL_URL
+    (process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+      : 'http://localhost:3000');
 
   await transporter.sendMail({
     from: process.env.GMAIL_USER,
