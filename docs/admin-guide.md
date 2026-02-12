@@ -133,8 +133,10 @@ Ghi lai **moi hanh dong** trong he thong:
 - `patient_consent_accepted` — Benh nhan dong y qua QR code
 - `pii_revealed` — Xem thong tin benh nhan
 - `pii_consent_acknowledged` — Dong y cam ket bao mat PII
+- `pii_deletion_completed` — Hoan tat xoa du lieu benh nhan
 - `booking_status_changed` — Thay doi trang thai dat lich
 - `staff_login` — Nhan vien dang nhap
+- `partner_login` — Doi tac dang nhap
 - `patient_data_deleted` — Xoa du lieu benh nhan
 
 ---
@@ -144,10 +146,19 @@ Ghi lai **moi hanh dong** trong he thong:
 Tuy chinh cac truong nhap lieu cua form tu van theo tung chuyen khoa.
 
 ### Cac tab chuyen khoa
+- Chung (common fields)
+- Nhi khoa
 - Da lieu
 - Sinh san
+- STD/STI
 - Tieu hoa
-- (Co the mo rong them)
+- Tim mach
+- Co Xuong Khop
+- Tai Mui Hong
+- Mat
+- Nam khoa
+- Tiem chung
+- Xet nghiem
 
 ### Chinh sua truong
 Moi truong co cac thuoc tinh:
@@ -176,3 +187,24 @@ Thuc hien yeu cau xoa du lieu (tuong tu GDPR right to erasure):
    - Ghi audit log
 
 **Luu y:** Sau khi xoa, du lieu benh nhan **khong the khoi phuc** vi encryption key da bi huy.
+
+---
+
+## 8. Theo doi Chi phi AI (LLM Budget)
+
+He thong tu dong theo doi chi phi su dung AI (OpenAI GPT-4o) cho chuc nang phan tich tu van.
+
+### Cau hinh ngan sach
+- Ngan sach hang thang duoc cau hinh qua bien moi truong `LLM_MONTHLY_BUDGET_USD`
+- Gia tri mac dinh: **$200/thang**
+
+### Nguong canh bao
+- **Soft cap 80%**: Khi chi phi dat 80% ngan sach, he thong hien thi **canh bao** tren giao dien quan tri de thong bao sap dat gioi han
+- **Hard cap 95%**: Khi chi phi dat 95% ngan sach, he thong **tam ngung chuc nang phan tich AI** de tranh vuot ngan sach
+
+### Tu dong reset
+- Budget duoc tu dong reset ve 0 vao **dau moi thang** (ngay 1 hang thang)
+
+### Xem thong ke su dung
+- Truy cap trang **Tong quan** (Dashboard) de xem usage stats hien tai
+- Thong tin hien thi bao gom: chi phi da su dung, phan tram ngan sach, so luot goi API trong thang

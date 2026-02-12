@@ -5,7 +5,7 @@
 ### Using the App
 
 1. Open the app in your browser (ask your dev for the URL).
-2. On the homepage, pick one of the 5 specialties: Nhi khoa, Da lieu, Sinh san, STD/STI, Tieu hoa.
+2. On the homepage, pick one of the 12 specialties: Nhi khoa, Da lieu, Sinh san, STD/STI, Tieu hoa, Tim mach, Co Xuong Khop, Tai Mui Hong, Mat, Nam khoa, Tiem chung, Xet nghiem.
 3. Fill in the patient form — fields marked with * are required.
 4. For "Khu vuc sinh song", if the patient is outside Ha Noi / TP.HCM / Da Nang / Can Tho, select "Tinh khac" and type the province name.
 5. Click **Phan tich & Tu van**. Wait for the AI analysis (usually 10-20 seconds).
@@ -30,6 +30,8 @@
 - A Google Cloud service account with Google Sheets API enabled
 - An OpenAI API key
 - A Gmail account with an App Password (for booking emails)
+- PostgreSQL (Neon)
+- Prisma
 
 ### Setup
 
@@ -47,6 +49,13 @@ GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\
 GOOGLE_SHEET_ID="your-google-sheet-id"
 GMAIL_USER="your-email@gmail.com"
 GMAIL_APP_PASSWORD="your-app-password"
+DATABASE_URL="postgresql://user:password@host:5432/dbname?sslmode=require"
+PII_ENCRYPTION_KEY="base64-encoded-32-byte-key"
+PARTNER_SESSION_SECRET="random-secret-for-partner-sessions"
+STAFF_SESSION_SECRET="random-secret-for-staff-sessions"
+ADMIN_SECRET="bearer-token-for-admin-api"
+CRON_SECRET="secret-for-cron-job-auth"
+NEXT_PUBLIC_BASE_URL="https://your-domain.com"
 ```
 
 ### Running Locally
@@ -70,10 +79,15 @@ npm start
 |---|---|
 | `/` | Homepage — specialty selector |
 | `/consult/[specialty]` | Patient form + AI analysis |
-| `/admin` | Form field editor (dev only) |
+| `/partner/login` | Partner portal login |
+| `/staff/login` | Staff login |
+| `/admin` | Admin portal (Bearer token auth) |
+| `/consent/[token]` | Patient consent page |
 | `/api/analyze` | POST — AI analysis endpoint |
 | `/api/booking` | POST — booking endpoint |
 | `/api/admin/form-config` | GET/POST — form config API |
+| `/api/cron/cleanup` | Cron — PII cleanup endpoint |
+| `/api/partners` | GET — partner list endpoint |
 
 ---
 
@@ -83,7 +97,7 @@ npm start
 
 1. Run the app locally: `npm run dev`
 2. Go to http://localhost:3000/admin
-3. Use the tabs to switch between Common fields and specialty-specific fields (Nhi, Da lieu, etc.)
+3. Use the tabs to switch between Common fields and specialty-specific fields (Nhi, Da lieu, Sinh san, STD/STI, Tieu hoa, Tim mach, Co Xuong Khop, Tai Mui Hong, Mat, Nam khoa, Tiem chung, Xet nghiem).
 4. For each field you can:
    - **Edit** — change label, type, required flag, options, placeholder
    - **Reorder** — use the up/down arrows
@@ -95,7 +109,7 @@ npm start
 
 Field types available: `text`, `number`, `select`, `textarea`, `checkbox-group`.
 
-The admin page is disabled in production (returns 403).
+The admin page uses Bearer token authentication. Set the `ADMIN_SECRET` environment variable and include the token in the `Authorization` header when accessing admin endpoints.
 
 ### 2. Partner Data (via Google Sheet)
 
@@ -160,6 +174,13 @@ Each specialty has its own prompt file in `lib/prompts/`:
 | `sinh-san.ts` | Sinh san |
 | `std-sti.ts` | STD/STI |
 | `tieu-hoa.ts` | Tieu hoa |
+| `tim-mach.ts` | Tim mach |
+| `co-xuong-khop.ts` | Co Xuong Khop |
+| `tai-mui-hong.ts` | Tai Mui Hong |
+| `mat.ts` | Mat |
+| `nam-khoa.ts` | Nam khoa |
+| `tiem-chung.ts` | Tiem chung |
+| `xet-nghiem.ts` | Xet nghiem |
 
 Each prompt has 4 layers:
 - **Layer 1** — Doctor role and experience
@@ -186,23 +207,57 @@ If you add new fields via the admin page, they are automatically included in the
 data/
   form-config.json    — form field definitions (edited via /admin)
   partners.json       — partner clinics (synced from Google Sheet)
-  specialties.json    — 5 specialties metadata
+  specialties.json    — 12 specialties metadata
 
 components/
   ConsultForm.tsx     — config-driven patient form
   AnalysisResult.tsx  — renders SOAP analysis output
   PartnerCard.tsx     — partner clinic card
+  PartnerSearch.tsx   — partner search and filtering
   BookingModal.tsx    — booking form modal
+  PIIConsentGate.tsx  — PII consent gate component
+  ConsentQRScreen.tsx — QR code consent screen
+  ConsentModal.tsx    — consent confirmation modal
+  StaffAuthGate.tsx   — staff authentication gate
+  AdminAuthGate.tsx   — admin authentication gate
+  ConfirmDialog.tsx   — reusable confirmation dialog
   LoadingSpinner.tsx  — loading indicator
   SpecialtyCard.tsx   — homepage specialty card
 
 app/
-  page.tsx                    — homepage
-  admin/page.tsx              — form config editor
-  consult/[specialty]/page.tsx — main consult flow
-  api/analyze/route.ts        — AI analysis endpoint
-  api/booking/route.ts        — booking endpoint
-  api/admin/form-config/route.ts — form config API
+  page.tsx                          — homepage
+  consult/[specialty]/page.tsx      — main consult flow
+  partner/
+    login/page.tsx                  — partner portal login
+    dashboard/page.tsx              — partner dashboard
+    bookings/page.tsx               — partner bookings list
+    bookings/[id]/page.tsx          — partner booking detail
+  staff/
+    login/page.tsx                  — staff login
+    dashboard/page.tsx              — staff dashboard
+  admin/
+    page.tsx                        — admin portal (form config editor)
+    bookings/page.tsx               — admin bookings management
+    bookings/[id]/page.tsx          — admin booking detail
+    staff/page.tsx                  — admin staff management
+    partners/page.tsx               — admin partners management
+  consent/
+    [token]/page.tsx                — patient consent page
+  api/
+    analyze/route.ts                — AI analysis endpoint
+    booking/route.ts                — booking endpoint
+    admin/
+      form-config/route.ts          — form config API
+      bookings/route.ts             — admin bookings API
+      bookings/[id]/route.ts        — admin booking detail API
+      staff/route.ts                — admin staff API
+    partner/
+      bookings/route.ts             — partner bookings API
+      bookings/[id]/route.ts        — partner booking detail API
+    partners/route.ts               — partner list endpoint
+    consent-token/[token]/route.ts  — consent token API
+    cron/
+      cleanup/route.ts              — PII cleanup cron endpoint
 
 lib/
   types.ts            — TypeScript interfaces
@@ -210,9 +265,29 @@ lib/
   sheets.ts           — Google Sheets integration
   mailer.ts           — booking email sender
   partners.ts         — partner loading and filtering
+  rate-limit.ts       — rate limiting utility
+  sanitize.ts         — input sanitization
+  usage.ts            — usage tracking
+  staff-auth.ts       — staff authentication logic
+  partner-auth.ts     — partner authentication logic
+  admin-auth.ts       — admin authentication logic
+  consent-token.ts    — consent token generation and validation
+  booking-number.ts   — booking number generator
+  db.ts               — database client (Prisma)
+  crypto.ts           — encryption/decryption utilities
   prompts/            — AI prompt templates (1 per specialty + shared)
+
+middleware.ts         — Next.js middleware (auth, rate limiting)
+
+prisma/
+  schema.prisma       — database schema
 
 scripts/
   sync-partners.ts    — Google Sheet -> partners.json sync
   crawl-partners.ts   — crawl partner websites for service data
+
+tests/
+  unit/               — unit tests
+  integration/        — integration tests
+  e2e/                — end-to-end tests
 ```

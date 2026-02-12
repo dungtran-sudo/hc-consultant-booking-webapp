@@ -76,7 +76,7 @@ node -e "console.log(require('crypto').randomBytes(24).toString('base64'))"
 npx prisma db push
 ```
 
-Lenh nay se tao tat ca 7 table trong PostgreSQL dua tren `prisma/schema.prisma`.
+Lenh nay se tao tat ca 11 table trong PostgreSQL dua tren `prisma/schema.prisma`.
 
 ### Tao tai khoan admin/staff dau tien
 
@@ -131,11 +131,15 @@ He thong co 3 lop xac thuc doc lap:
 | Partner | `partner_session` | `PARTNER_SESSION_SECRET` | `lib/partner-auth.ts` |
 | Admin | Bearer token | `ADMIN_SECRET` | `lib/admin-auth.ts` |
 
-Moi session token co dinh dang: `id:role:name:hmac_signature`
+Staff session token co dinh dang: `staffId:role:name:timestamp:signature` (het han sau 24 gio)
+
+Partner session token co dinh dang: `partnerId:timestamp:signature` (het han sau 7 ngay)
+
+Admin su dung Bearer token (khong het han, doi chieu voi ADMIN_SECRET)
 
 ### Database Models
 
-7 models trong Prisma schema:
+11 models trong Prisma schema:
 
 | Model | Table | Muc dich |
 |-------|-------|----------|
@@ -146,6 +150,11 @@ Moi session token co dinh dang: `id:role:name:hmac_signature`
 | EncryptionKey | `encryption_keys` | Khoa ma hoa per-patient |
 | AuditLog | `audit_logs` | Nhat ky hanh dong |
 | DeletionRequest | `deletion_requests` | Yeu cau xoa du lieu |
+| Partner | `partners` | Doi tac y te (phong kham, benh vien) |
+| PartnerBranch | `partner_branches` | Chi nhanh doi tac |
+| PartnerService | `partner_services` | Dich vu theo doi tac va chuyen khoa |
+| ApiUsageLog | `api_usage_logs` | Theo doi chi phi su dung AI |
+| RateLimit | `rate_limits` | Gioi han truy cap per-IP |
 
 ---
 
@@ -154,50 +163,73 @@ Moi session token co dinh dang: `id:role:name:hmac_signature`
 ```
 app/                    # Next.js App Router
   page.tsx              # Trang chu — chon chuyen khoa
-  layout.tsx            # Root layout (Vietnamese lang, metadata)
+  layout.tsx            # Root layout
   consult/              # Trang tu van
   consent/              # Trang consent benh nhan (public)
-  partner/              # Portal doi tac
+  partner/              # Portal doi tac (login, dashboard)
   staff/                # Dang nhap nhan vien
-  admin/                # Portal quan tri
+  admin/                # Portal quan tri (7 trang)
   api/                  # API routes
+    analyze/            # AI analysis
+    booking/            # Tao dat lich
+    consent-token/      # Consent token CRUD
+    partner/            # Partner APIs (bookings, reveal, status, login, logout)
+    partners/           # Public partner listing
+    staff/              # Staff auth APIs
+    admin/              # Admin APIs (stats, bookings, staff, audit, form-config, delete-patient, usage-stats)
+    cron/               # Automated cleanup
+
+middleware.ts           # CSRF protection (Origin header validation)
 
 components/             # React components
   BookingModal.tsx      # Modal dat lich voi QR consent flow
-  ConsentQRScreen.tsx   # Hien thi ma QR + polling trang thai
+  ConsentQRScreen.tsx   # Ma QR + polling trang thai
+  ConsultForm.tsx       # Form tu van theo chuyen khoa
+  AnalysisResult.tsx    # Ket qua AI (SOAP)
+  PartnerCard.tsx       # The doi tac
+  PartnerSearch.tsx     # Tim kiem doi tac
   ConfirmDialog.tsx     # Hop thoai xac nhan
   PIIConsentGate.tsx    # Modal cam ket bao mat PII
   StaffAuthGate.tsx     # Gate xac thuc nhan vien
   AdminAuthGate.tsx     # Gate xac thuc admin
-  ConsultForm.tsx       # Form tu van theo chuyen khoa
-  AnalysisResult.tsx    # Hien thi ket qua AI (SOAP)
-  PartnerCard.tsx       # The doi tac
   ConsentModal.tsx      # Modal consent truyen thong (fallback)
+  SpecialtyCard.tsx     # The chuyen khoa trang chu
+  LoadingSpinner.tsx    # Loading indicator
 
 lib/                    # Server utilities
   db.ts                 # Prisma client (Neon adapter, lazy init)
   crypto.ts             # AES-256-GCM encryption/decryption
-  staff-auth.ts         # Staff auth (scrypt + HMAC)
-  partner-auth.ts       # Partner auth
-  admin-auth.ts         # Admin auth
-  booking-number.ts     # Tao ma dat lich (HHG-XXX-XXXX-XX)
-  consent-token.ts      # Tao token consent
+  staff-auth.ts         # Staff auth (scrypt + HMAC, 24h expiry)
+  partner-auth.ts       # Partner auth (HMAC, 7d expiry)
+  admin-auth.ts         # Admin auth (Bearer token)
+  booking-number.ts     # Ma dat lich (HHG-XXX-XXXX-XX)
+  consent-token.ts      # Token consent
   consent.ts            # Logic consent
   mailer.ts             # Nodemailer (Gmail SMTP)
-  openai.ts             # OpenAI client
+  openai.ts             # OpenAI client (lazy init)
   partners.ts           # Load/filter partners
+  rate-limit.ts         # Rate limiting per-IP
+  sanitize.ts           # Input sanitization (HTML/control chars)
+  usage.ts              # LLM budget tracking (reserve/finalize/cancel)
   types.ts              # TypeScript interfaces
-  prompts/              # AI prompt templates (5 chuyen khoa)
+  prompts/              # AI prompt templates (12 chuyen khoa)
 
 data/                   # Du lieu tinh
   partners.json         # Thong tin doi tac y te
-  specialties.json      # Metadata 5 chuyen khoa
-  partner-passwords.json # Mat khau doi tac (hashed)
+  specialties.json      # Metadata 12 chuyen khoa
   form-config.json      # Cau hinh form dong
 
 prisma/
-  schema.prisma         # Database schema (7 models)
-  migrations/           # Migration history
+  schema.prisma         # Database schema (11 models)
+
+tests/                  # Test suite (Vitest)
+  unit/                 # Unit tests
+  integration/          # API integration tests
+  e2e/                  # End-to-end flow tests
+
+scripts/
+  sync-partners.ts      # Google Sheet → partners.json sync
+  crawl-partners.ts     # Crawl partner websites
 ```
 
 ---
@@ -232,7 +264,7 @@ vercel alias set <deployment-url> hhg-booking.vercel.app
 
 ### Kiem tra sau deploy
 
-1. Truy cap https://hhg-booking.vercel.app — trang chu hien thi 5 chuyen khoa
+1. Truy cap https://hhg-booking.vercel.app — trang chu hien thi 12 chuyen khoa
 2. Chon 1 chuyen khoa, dien form, gui — AI analysis hien thi
 3. Dang nhap staff tai `/staff/login`
 4. Dang nhap partner tai `/partner/login`
@@ -300,3 +332,32 @@ vercel inspect <deployment-url> --logs
 - `prisma db execute --url` **KHONG** hoat dong trong Prisma v7
 - Bo flag `--url`, Prisma se tu doc tu datasource config
 - Uu tien `prisma db push` cho development, `prisma migrate` cho production
+
+---
+
+## 7. Bao mat
+
+### CSRF Protection
+
+`middleware.ts` kiem tra Origin header tren tat ca request POST/PATCH/PUT/DELETE den `/api/*`. Request khong co Origin hop le se bi tu choi.
+
+### Rate Limiting
+
+Gioi han truy cap per-IP tren tat ca API endpoints:
+
+- `analyze`: 10 request/phut
+- `booking`: 20 request/gio
+- Partner endpoints: 30-60 request/phut
+
+### Input Sanitization
+
+HTML tags va control characters duoc loai bo khoi tat ca input cua nguoi dung truoc khi xu ly. Xu ly boi `lib/sanitize.ts`.
+
+### Session Token Expiry
+
+- Partner: 7 ngay — timestamp duoc nhung trong HMAC payload
+- Staff: 24 gio — timestamp duoc nhung trong HMAC payload
+
+### LLM Budget Control
+
+Su dung pattern atomic reserve/finalize/cancel de ngan chan overspend khi co nhieu request dong thoi. Budget duoc theo doi trong bang `api_usage_logs`.

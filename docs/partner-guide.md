@@ -10,14 +10,43 @@ Portal doi tac cho phep cac doi tac y te (phong kham, benh vien) quan ly dat lic
 
 ## Dang nhap
 
-1. Truy cap trang dang nhap tai `/partner/login`
-2. Nhap **ten doi tac** (do quan tri cung cap)
-3. Nhap **mat khau**
-4. Nhan "Dang nhap"
+Moi doi tac co **duong dan dang nhap rieng** (VD: `/partner/login/diag`, `/partner/login/vinmec`).
+
+Duong dan nay duoc gui qua email thong bao booking.
+
+Cung co the dang nhap tai `/partner/login` (nhap ten doi tac thu cong).
+
+**Cach dang nhap:**
+1. Truy cap duong dan dang nhap rieng cua doi tac (hoac `/partner/login`)
+2. Nhap **mat khau** do quan tri cung cap
+3. Nhan "Dang nhap"
 
 Sau khi dang nhap, ban se duoc chuyen den dashboard quan ly dat lich.
 
 **Dang xuat:** Nhan nut "Dang xuat" o goc tren ben phai.
+
+---
+
+## Bao mat Phien dang nhap
+
+- Phien dang nhap co hieu luc **7 ngay** ke tu khi dang nhap
+- Sau 7 ngay, ban se phai dang nhap lai
+- Phien duoc luu trong cookie an toan (httpOnly)
+- **Khong chia se duong dan dang nhap** voi nguoi ngoai to chuc
+
+---
+
+## Gioi han Truy cap (Rate Limiting)
+
+He thong gioi han so luong truy cap de bao ve bao mat:
+
+| Hanh dong | Gioi han |
+|-----------|----------|
+| Danh sach dat lich | 60 yeu cau/phut |
+| Xem thong tin benh nhan | 30 yeu cau/phut |
+| Cap nhat trang thai | 30 yeu cau/phut |
+
+Neu vuot qua gioi han, ban se nhan thong bao loi tam thoi.
 
 ---
 
@@ -70,6 +99,10 @@ Tuy theo trang thai hien tai, ban se thay cac nut hanh dong:
 - Hanh dong "Huy" hien thi voi giao dien mau do (canh bao)
 - Phai nhan "Xac nhan" trong hop thoai de thuc hien
 
+**Xu ly loi:**
+- Khi cap nhat trang thai, neu co loi he thong se hien thong bao cu the
+- Khi xem chi tiet benh nhan, neu phien het han he thong se tu dong chuyen ve trang dang nhap
+
 ---
 
 ## Xem Thong tin Benh nhan (PII)
@@ -113,6 +146,8 @@ Khi co dat lich moi, doi tac se nhan email tu he thong voi:
 - Ten dich vu
 - Ngay va gio mong muon
 - Dia chi chi nhanh
+
+Email thong bao bao gom **lien ket truc tiep** den portal doi tac. Doi tac co the nhan vao lien ket trong email de dang nhap nhanh.
 
 Email duoc gui tu dia chi Gmail cua he thong.
 

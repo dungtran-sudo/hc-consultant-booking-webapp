@@ -24,11 +24,19 @@ Sau khi dang nhap, ban se thay **badge ten nhan vien** o goc tren cua trang tu v
 
 ---
 
+## Bao mat Phien dang nhap
+
+- Phien dang nhap co hieu luc **24 gio**
+- Sau 24 gio, ban se phai dang nhap lai
+- He thong tu dong chuyen ve trang dang nhap khi phien het han
+
+---
+
 ## Quy trinh Tu van
 
 ### Buoc 1: Chon chuyen khoa
 
-Tai trang chu (`/`), chon 1 trong 5 chuyen khoa:
+Tai trang chu (`/`), chon 1 trong 12 chuyen khoa:
 
 | Chuyen khoa | Mo ta |
 |-------------|-------|
@@ -37,6 +45,13 @@ Tai trang chu (`/`), chon 1 trong 5 chuyen khoa:
 | Sinh san | San phu khoa, ho tro sinh san, IVF |
 | STD/STI | Benh lay truyen qua duong tinh duc |
 | Tieu hoa | Benh ly duong tieu hoa, gan mat |
+| Tim mach | Benh ly tim mach, tang huyet ap, mach vanh |
+| Co Xuong Khop | Thoai hoa khop, gout, loang xuong, dau lung |
+| Tai Mui Hong | Viem mui xoang, viem amidan, u tai |
+| Mat | Can thi, duc thuy tinh the, glaucoma |
+| Nam khoa | Tiet nieu nam, roi loan cuong, tien liet tuyen |
+| Tiem chung | Tu van lich tiem chung, vaccine bo sung, tiem phong du lich |
+| Xet nghiem | Tu van xet nghiem tam soat, goi kham suc khoe, doc ket qua |
 
 ### Buoc 2: Dien phieu thong tin
 
@@ -57,6 +72,13 @@ Form gom 2 phan:
 - Sinh san: Chu ky kinh, tien su san phu khoa, muc tieu kham
 - STD/STI: Quan he tinh duc, trieu chung cu the, xet nghiem gan nhat
 - Tieu hoa: Vi tri dau, tinh chat phan, che do an, tien su tieu hoa
+- Tim mach: Huyet ap, tien su tim mach, yeu to nguy co, tien su gia dinh
+- Co Xuong Khop: Vi tri dau, tinh chat dau, nghe nghiep, tien su chan thuong
+- Tai Mui Hong: Vung bi anh huong, tien su di ung, hut thuoc la, tiep xuc tieng on
+- Mat: Mat bi anh huong, deo kinh, tien su benh mat, benh nen
+- Nam khoa: Nhom trieu chung, tien su nam khoa, thuoc la/ruou bia, benh nen
+- Tiem chung: Doi tuong tiem, tuoi thang, muc dich tiem, tien su tiem chung, di ung vaccine, dang mang thai
+- Xet nghiem: Muc dich xet nghiem, nhom xet nghiem, tien su benh ly, dang dung thuoc, da an sang
 
 ### Buoc 3: Phan tich AI
 
@@ -95,6 +117,8 @@ Phia duoi ket qua phan tich, he thong goi y cac **doi tac y te phu hop**:
 | Ngay mong muon | Chon ngay kham |
 | Gio mong muon | Chon khung gio (7:00-11:30 / 13:00-16:30 / 17:00-19:00) |
 | Ghi chu | Thong tin bo sung (tuy chon) |
+
+> **Luu y ve so dien thoai:** So dien thoai phai dung dinh dang Viet Nam (10 chu so, bat dau bang 0). VD: 0901234567
 
 ### Buoc 2: Gui va cho benh nhan xac nhan
 
