@@ -68,5 +68,19 @@
     "icon": "",
     "description": "Tiết niệu nam, rối loạn cương, tiền liệt tuyến, vô sinh nam",
     "color": "blue"
+  },
+  {
+    "id": "tiem-chung",
+    "label": "Tiêm chủng",
+    "icon": "",
+    "description": "Tư vấn lịch tiêm chủng, vaccine bổ sung, tiêm phòng du lịch",
+    "color": "blue"
+  },
+  {
+    "id": "xet-nghiem",
+    "label": "Xét nghiệm",
+    "icon": "",
+    "description": "Tư vấn xét nghiệm tầm soát, gói khám sức khỏe, đọc kết quả",
+    "color": "blue"
   }
 ]

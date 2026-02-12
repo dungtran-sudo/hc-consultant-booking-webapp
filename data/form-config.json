@@ -107,6 +107,29 @@
         { "id": "hutThuocRuouBia", "label": "Hút thuốc lá/rượu bia?", "type": "select", "required": false, "options": ["Hút thuốc + uống rượu bia", "Chỉ hút thuốc", "Chỉ uống rượu bia", "Không"] },
         { "id": "benhNenNamKhoa", "label": "Bệnh nền (ĐTĐ, tim mạch, tăng HA)?", "type": "textarea", "required": false, "placeholder": "Đái tháo đường, tăng huyết áp, bệnh tim mạch...", "rows": 2 }
       ]
+    },
+    {
+      "specialtyId": "tiem-chung",
+      "sectionTitle": "Thông tin Tiêm chủng",
+      "fields": [
+        { "id": "doiTuong", "label": "Đối tượng tiêm", "type": "select", "required": true, "options": ["Trẻ em (0-12 tháng)", "Trẻ em (1-6 tuổi)", "Trẻ em (7-15 tuổi)", "Người lớn", "Phụ nữ mang thai", "Du lịch/công tác nước ngoài"] },
+        { "id": "tuoiThang", "label": "Tuổi (tháng) — nếu trẻ em", "type": "number", "required": false, "placeholder": "VD: 6, 12, 24...", "gridCol": 2 },
+        { "id": "mucDichTiem", "label": "Mục đích tiêm", "type": "select", "required": true, "options": ["Tiêm theo lịch TCMR", "Tiêm bổ sung/bù mũi trễ", "Tiêm phòng du lịch", "Tiêm sau phơi nhiễm (dại, uốn ván...)", "Tư vấn lịch tiêm chủng"] },
+        { "id": "tienSuTiemChung", "label": "Tiền sử tiêm chủng", "type": "textarea", "required": false, "placeholder": "Đã tiêm những mũi nào? Còn thiếu mũi nào? Có sổ tiêm chủng không?", "rows": 2 },
+        { "id": "tienSuDiUngVaccine", "label": "Dị ứng vaccine trước đó?", "type": "select", "required": false, "options": ["Không", "Có (sốt cao, sưng nhiều)", "Có (phản ứng nặng/sốc phản vệ)", "Không rõ"] },
+        { "id": "dangMangThai", "label": "Đang mang thai/cho con bú?", "type": "select", "required": false, "options": ["Không", "Đang mang thai", "Đang cho con bú", "Không áp dụng"] }
+      ]
+    },
+    {
+      "specialtyId": "xet-nghiem",
+      "sectionTitle": "Thông tin Xét nghiệm",
+      "fields": [
+        { "id": "mucDichXetNghiem", "label": "Mục đích xét nghiệm", "type": "select", "required": true, "options": ["Tầm soát/khám sức khỏe định kỳ", "Theo dõi bệnh đang điều trị", "Có triệu chứng cần xét nghiệm", "Trước phẫu thuật/thủ thuật", "Đọc/giải thích kết quả xét nghiệm"] },
+        { "id": "nhomXetNghiem", "label": "Nhóm xét nghiệm quan tâm", "type": "checkbox-group", "required": false, "options": ["Máu (công thức máu, sinh hóa)", "Nước tiểu", "Siêu âm", "X-quang/CT/MRI", "Xét nghiệm ung thư", "Xét nghiệm STI/HIV", "Khác"], "gridCol": 3 },
+        { "id": "tienSuBenhLy", "label": "Tiền sử bệnh lý", "type": "textarea", "required": false, "placeholder": "Bệnh đang điều trị, tiền sử gia đình (ung thư, ĐTĐ, tim mạch)...", "rows": 2 },
+        { "id": "dangDungThuoc", "label": "Đang dùng thuốc gì?", "type": "textarea", "required": false, "placeholder": "Liệt kê thuốc đang dùng hàng ngày...", "rows": 2 },
+        { "id": "daAnSang", "label": "Đã ăn sáng hôm nay chưa?", "type": "select", "required": false, "options": ["Chưa ăn (nhịn đói)", "Đã ăn/uống", "Không áp dụng"] }
+      ]
     }
   ]
 }

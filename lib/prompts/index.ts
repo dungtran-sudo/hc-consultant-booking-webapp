@@ -9,6 +9,8 @@ import { buildCoXuongKhopPrompt } from './co-xuong-khop';
 import { buildTaiMuiHongPrompt } from './tai-mui-hong';
 import { buildMatPrompt } from './mat';
 import { buildNamKhoaPrompt } from './nam-khoa';
+import { buildTiemChungPrompt } from './tiem-chung';
+import { buildXetNghiemPrompt } from './xet-nghiem';
 
 export function buildPrompt(specialty: string, formData: FormData): string {
   switch (specialty) {
@@ -22,6 +24,8 @@ export function buildPrompt(specialty: string, formData: FormData): string {
     case 'tai-mui-hong': return buildTaiMuiHongPrompt(formData);
     case 'mat': return buildMatPrompt(formData);
     case 'nam-khoa': return buildNamKhoaPrompt(formData);
+    case 'tiem-chung': return buildTiemChungPrompt(formData);
+    case 'xet-nghiem': return buildXetNghiemPrompt(formData);
     default: throw new Error(`Unknown specialty: ${specialty}`);
   }
 }

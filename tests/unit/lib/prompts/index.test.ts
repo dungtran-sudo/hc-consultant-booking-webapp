@@ -73,6 +73,18 @@ describe('buildPrompt', () => {
     expect(result.length).toBeGreaterThan(0);
   });
 
+  it('returns string for tiem-chung', () => {
+    const result = buildPrompt('tiem-chung', sampleFormData);
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it('returns string for xet-nghiem', () => {
+    const result = buildPrompt('xet-nghiem', sampleFormData);
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+  });
+
   it('throws for unknown specialty', () => {
     expect(() => buildPrompt('unknown', sampleFormData)).toThrow(
       'Unknown specialty: unknown'
@@ -88,7 +100,7 @@ describe('buildPrompt', () => {
   });
 
   describe('Layer 4 — new output sections', () => {
-    const specialties = ['nhi', 'da-lieu', 'sinh-san', 'std-sti', 'tieu-hoa', 'tim-mach', 'co-xuong-khop', 'tai-mui-hong', 'mat', 'nam-khoa'];
+    const specialties = ['nhi', 'da-lieu', 'sinh-san', 'std-sti', 'tieu-hoa', 'tim-mach', 'co-xuong-khop', 'tai-mui-hong', 'mat', 'nam-khoa', 'tiem-chung', 'xet-nghiem'];
 
     specialties.forEach((specialty) => {
       describe(`${specialty}`, () => {
@@ -233,6 +245,22 @@ describe('buildPrompt', () => {
       expect(prompt).toContain('Sildenafil');
       expect(prompt).toContain('nam tính');
     });
+
+    it('tiem-chung includes TCMR program and vaccine hesitancy', () => {
+      const prompt = buildPrompt('tiem-chung', sampleFormData);
+      expect(prompt).toContain('TCMR');
+      expect(prompt).toContain('Quinvaxem');
+      expect(prompt).toContain('HPV');
+      expect(prompt).toContain('dại');
+    });
+
+    it('xet-nghiem includes HBV screening and gói khám pitfalls', () => {
+      const prompt = buildPrompt('xet-nghiem', sampleFormData);
+      expect(prompt).toContain('HBsAg');
+      expect(prompt).toContain('Gói khám tổng quát');
+      expect(prompt).toContain('Medlatec');
+      expect(prompt).toContain('TIRADS');
+    });
   });
 
   describe('Layer 3 — specialty-specific form fields', () => {
@@ -264,6 +292,18 @@ describe('buildPrompt', () => {
       const data = { ...sampleFormData, nhomTrieuChung: 'Tiểu khó' };
       const prompt = buildPrompt('nam-khoa', data);
       expect(prompt).toContain('Tiểu khó');
+    });
+
+    it('tiem-chung includes vaccination purpose field', () => {
+      const data = { ...sampleFormData, mucDichTiem: 'Tiêm bổ sung' };
+      const prompt = buildPrompt('tiem-chung', data);
+      expect(prompt).toContain('Tiêm bổ sung');
+    });
+
+    it('xet-nghiem includes test purpose field', () => {
+      const data = { ...sampleFormData, mucDichXetNghiem: 'Tầm soát' };
+      const prompt = buildPrompt('xet-nghiem', data);
+      expect(prompt).toContain('Tầm soát');
     });
   });
 });
