@@ -35,6 +35,13 @@ const TABS = [
   { id: 'sinh-san', label: 'Sinh sản' },
   { id: 'std-sti', label: 'STD/STI' },
   { id: 'tieu-hoa', label: 'Tiêu hóa' },
+  { id: 'tim-mach', label: 'Tim mạch' },
+  { id: 'co-xuong-khop', label: 'Cơ Xương Khớp' },
+  { id: 'tai-mui-hong', label: 'Tai Mũi Họng' },
+  { id: 'mat', label: 'Mắt' },
+  { id: 'nam-khoa', label: 'Nam khoa' },
+  { id: 'tiem-chung', label: 'Tiêm chủng' },
+  { id: 'xet-nghiem', label: 'Xét nghiệm' },
 ];
 
 function FieldCard({
@@ -220,10 +227,16 @@ export default function AdminFormConfigPage() {
   const [saveMessage, setSaveMessage] = useState('');
 
   useEffect(() => {
-    fetch('/api/admin/form-config')
-      .then((r) => r.json())
-      .then(setConfig);
-  }, []);
+    fetch('/api/admin/form-config', {
+      headers: { Authorization: `Bearer ${secret}` },
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error('Unauthorized');
+        return r.json();
+      })
+      .then(setConfig)
+      .catch(() => setConfig(null));
+  }, [secret]);
 
   if (!config) {
     return (

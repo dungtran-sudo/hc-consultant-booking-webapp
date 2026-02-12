@@ -155,6 +155,19 @@ export default function PartnerDashboardPage() {
       const res = await fetch(`/api/partner/bookings/${bookingId}/reveal`, {
         method: 'POST',
       });
+
+      if (res.status === 401) {
+        const savedPartnerId = localStorage.getItem('partnerId');
+        router.push(savedPartnerId ? `/partner/login/${savedPartnerId}` : '/partner/login');
+        return;
+      }
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || 'Lỗi khi tải chi tiết');
+        return;
+      }
+
       const data = await res.json();
 
       if (data.deleted) {
@@ -189,8 +202,10 @@ export default function PartnerDashboardPage() {
         setBookings((prev) =>
           prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b))
         );
-        // Refresh to update counts
         fetchBookings();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || 'Lỗi khi cập nhật trạng thái');
       }
     } catch {
       setError('Lỗi khi cập nhật');
