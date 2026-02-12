@@ -57,6 +57,56 @@
         { "id": "cheDoDanUong", "label": "Chế độ ăn uống", "type": "textarea", "required": false, "placeholder": "Thói quen ăn uống, thực phẩm gần đây...", "rows": 2 },
         { "id": "tienSuTieuHoa", "label": "Tiền sử bệnh tiêu hóa", "type": "textarea", "required": false, "placeholder": "Đau dạ dày, viêm đại tràng, phẫu thuật bụng...", "rows": 2 }
       ]
+    },
+    {
+      "specialtyId": "tim-mach",
+      "sectionTitle": "Thông tin Tim mạch",
+      "fields": [
+        { "id": "huyetAp", "label": "Huyết áp đo gần nhất (mmHg)", "type": "text", "required": false, "placeholder": "VD: 130/85", "gridCol": 2 },
+        { "id": "tienSuTimMach", "label": "Tiền sử bệnh tim mạch", "type": "textarea", "required": false, "placeholder": "Tăng huyết áp, bệnh mạch vành, suy tim...", "rows": 2 },
+        { "id": "yeuToNguyCo", "label": "Yếu tố nguy cơ", "type": "checkbox-group", "required": false, "options": ["Hút thuốc lá", "Đái tháo đường", "Mỡ máu cao", "Béo phì", "Ít vận động", "Uống rượu bia nhiều"], "gridCol": 3 },
+        { "id": "tienSuGiaDinh", "label": "Gia đình có người bệnh tim mạch?", "type": "select", "required": false, "options": ["Có", "Không", "Không rõ"] }
+      ]
+    },
+    {
+      "specialtyId": "co-xuong-khop",
+      "sectionTitle": "Thông tin Cơ Xương Khớp",
+      "fields": [
+        { "id": "viTriDau", "label": "Vị trí đau", "type": "checkbox-group", "required": true, "options": ["Khớp gối", "Cột sống thắt lưng", "Cột sống cổ", "Khớp vai", "Khớp háng", "Bàn tay/ngón tay", "Bàn chân/ngón chân", "Khác"], "gridCol": 4 },
+        { "id": "tinhChatDau", "label": "Tính chất đau", "type": "select", "required": true, "options": ["Đau liên tục", "Đau khi vận động", "Cứng khớp buổi sáng", "Sưng nóng đỏ khớp", "Đau lan xuống chân/tay", "Tê bì"] },
+        { "id": "ngheNghiep", "label": "Nghề nghiệp", "type": "text", "required": false, "placeholder": "VD: Công nhân, văn phòng, nông dân...", "gridCol": 2 },
+        { "id": "tienSuChanThuong", "label": "Tiền sử chấn thương", "type": "textarea", "required": false, "placeholder": "Gãy xương, trật khớp, tai nạn...", "rows": 2 }
+      ]
+    },
+    {
+      "specialtyId": "tai-mui-hong",
+      "sectionTitle": "Thông tin Tai Mũi Họng",
+      "fields": [
+        { "id": "vungBiAnhHuong", "label": "Vùng bị ảnh hưởng", "type": "checkbox-group", "required": true, "options": ["Tai", "Mũi", "Họng", "Xoang", "Thanh quản"], "gridCol": 3 },
+        { "id": "tienSuDiUngTMH", "label": "Tiền sử dị ứng/viêm mũi", "type": "textarea", "required": false, "placeholder": "Viêm mũi dị ứng, hen suyễn, dị ứng thuốc...", "rows": 2 },
+        { "id": "hutThuocLa", "label": "Hút thuốc lá?", "type": "select", "required": false, "options": ["Có", "Đã bỏ", "Không", "Hút thuốc thụ động"] },
+        { "id": "tiepXucTiengOn", "label": "Tiếp xúc tiếng ồn thường xuyên?", "type": "select", "required": false, "options": ["Có (công việc)", "Có (tai nghe/karaoke)", "Không"] }
+      ]
+    },
+    {
+      "specialtyId": "mat",
+      "sectionTitle": "Thông tin Mắt",
+      "fields": [
+        { "id": "matBiAnhHuong", "label": "Mắt bị ảnh hưởng", "type": "select", "required": true, "options": ["Mắt phải", "Mắt trái", "Cả hai mắt"] },
+        { "id": "deoKinh", "label": "Đeo kính/kính áp tròng?", "type": "select", "required": false, "options": ["Kính cận", "Kính viễn", "Kính áp tròng", "Không đeo kính"], "gridCol": 2 },
+        { "id": "tienSuBenhMat", "label": "Tiền sử bệnh mắt", "type": "textarea", "required": false, "placeholder": "Cận thị, đục thủy tinh thể, glaucoma, phẫu thuật mắt...", "rows": 2 },
+        { "id": "benhNen", "label": "Bệnh nền (ĐTĐ, tăng HA)?", "type": "textarea", "required": false, "placeholder": "Đái tháo đường, tăng huyết áp, bệnh tự miễn...", "rows": 2 }
+      ]
+    },
+    {
+      "specialtyId": "nam-khoa",
+      "sectionTitle": "Thông tin Nam khoa",
+      "fields": [
+        { "id": "nhomTrieuChung", "label": "Nhóm triệu chứng", "type": "select", "required": true, "options": ["Tiểu khó/tiểu nhiều lần", "Rối loạn cương dương", "Đau vùng bìu/tinh hoàn", "Vô sinh nam", "Sỏi tiết niệu", "Khác"] },
+        { "id": "tienSuNamKhoa", "label": "Tiền sử tiết niệu/nam khoa", "type": "textarea", "required": false, "placeholder": "Viêm tiền liệt tuyến, sỏi thận, phẫu thuật...", "rows": 2 },
+        { "id": "hutThuocRuouBia", "label": "Hút thuốc lá/rượu bia?", "type": "select", "required": false, "options": ["Hút thuốc + uống rượu bia", "Chỉ hút thuốc", "Chỉ uống rượu bia", "Không"] },
+        { "id": "benhNenNamKhoa", "label": "Bệnh nền (ĐTĐ, tim mạch, tăng HA)?", "type": "textarea", "required": false, "placeholder": "Đái tháo đường, tăng huyết áp, bệnh tim mạch...", "rows": 2 }
+      ]
     }
   ]
 }

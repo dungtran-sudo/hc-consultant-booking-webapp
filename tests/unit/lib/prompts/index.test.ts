@@ -43,6 +43,36 @@ describe('buildPrompt', () => {
     expect(result.length).toBeGreaterThan(0);
   });
 
+  it('returns string for tim-mach', () => {
+    const result = buildPrompt('tim-mach', sampleFormData);
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it('returns string for co-xuong-khop', () => {
+    const result = buildPrompt('co-xuong-khop', sampleFormData);
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it('returns string for tai-mui-hong', () => {
+    const result = buildPrompt('tai-mui-hong', sampleFormData);
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it('returns string for mat', () => {
+    const result = buildPrompt('mat', sampleFormData);
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it('returns string for nam-khoa', () => {
+    const result = buildPrompt('nam-khoa', sampleFormData);
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+  });
+
   it('throws for unknown specialty', () => {
     expect(() => buildPrompt('unknown', sampleFormData)).toThrow(
       'Unknown specialty: unknown'
@@ -58,7 +88,7 @@ describe('buildPrompt', () => {
   });
 
   describe('Layer 4 — new output sections', () => {
-    const specialties = ['nhi', 'da-lieu', 'sinh-san', 'std-sti', 'tieu-hoa'];
+    const specialties = ['nhi', 'da-lieu', 'sinh-san', 'std-sti', 'tieu-hoa', 'tim-mach', 'co-xuong-khop', 'tai-mui-hong', 'mat', 'nam-khoa'];
 
     specialties.forEach((specialty) => {
       describe(`${specialty}`, () => {
@@ -162,6 +192,78 @@ describe('buildPrompt', () => {
       expect(prompt).toContain('HBsAg');
       expect(prompt).toContain('Clonorchis');
       expect(prompt).toContain('AFP');
+    });
+
+    it('tim-mach includes CVD mortality rate and smoking prevalence', () => {
+      const prompt = buildPrompt('tim-mach', sampleFormData);
+      expect(prompt).toContain('31%');
+      expect(prompt).toContain('45%');
+      expect(prompt).toContain('9.4g');
+      expect(prompt).toContain('Golden hour');
+    });
+
+    it('co-xuong-khop includes osteoarthritis prevalence and NSAID abuse', () => {
+      const prompt = buildPrompt('co-xuong-khop', sampleFormData);
+      expect(prompt).toContain('30%');
+      expect(prompt).toContain('Diclofenac');
+      expect(prompt).toContain('Cushing');
+      expect(prompt).toContain('Glucosamine');
+    });
+
+    it('tai-mui-hong includes NPC epidemiology and nasal spray abuse', () => {
+      const prompt = buildPrompt('tai-mui-hong', sampleFormData);
+      expect(prompt).toContain('NPC');
+      expect(prompt).toContain('EBV');
+      expect(prompt).toContain('Xylometazoline');
+      expect(prompt).toContain('VA');
+    });
+
+    it('mat includes myopia prevalence and corticoid eye drops risk', () => {
+      const prompt = buildPrompt('mat', sampleFormData);
+      expect(prompt).toContain('52.7%');
+      expect(prompt).toContain('Dexamethasone');
+      expect(prompt).toContain('Phaco');
+      expect(prompt).toContain('LASIK');
+    });
+
+    it('nam-khoa includes ED prevalence and cultural barriers', () => {
+      const prompt = buildPrompt('nam-khoa', sampleFormData);
+      expect(prompt).toContain('30%');
+      expect(prompt).toContain('PSA');
+      expect(prompt).toContain('Sildenafil');
+      expect(prompt).toContain('nam tính');
+    });
+  });
+
+  describe('Layer 3 — specialty-specific form fields', () => {
+    it('tim-mach includes blood pressure field', () => {
+      const data = { ...sampleFormData, huyetAp: '140/90' };
+      const prompt = buildPrompt('tim-mach', data);
+      expect(prompt).toContain('140/90');
+    });
+
+    it('co-xuong-khop includes pain location field', () => {
+      const data = { ...sampleFormData, viTriDau: 'Khớp gối' };
+      const prompt = buildPrompt('co-xuong-khop', data);
+      expect(prompt).toContain('Khớp gối');
+    });
+
+    it('tai-mui-hong includes affected area field', () => {
+      const data = { ...sampleFormData, vungBiAnhHuong: 'Mũi, Xoang' };
+      const prompt = buildPrompt('tai-mui-hong', data);
+      expect(prompt).toContain('Mũi, Xoang');
+    });
+
+    it('mat includes affected eye field', () => {
+      const data = { ...sampleFormData, matBiAnhHuong: 'Cả hai mắt' };
+      const prompt = buildPrompt('mat', data);
+      expect(prompt).toContain('Cả hai mắt');
+    });
+
+    it('nam-khoa includes symptom group field', () => {
+      const data = { ...sampleFormData, nhomTrieuChung: 'Tiểu khó' };
+      const prompt = buildPrompt('nam-khoa', data);
+      expect(prompt).toContain('Tiểu khó');
     });
   });
 });

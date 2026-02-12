@@ -33,5 +33,40 @@
     "icon": "",
     "description": "Các bệnh lý đường tiêu hóa, gan mật, đại tràng",
     "color": "blue"
+  },
+  {
+    "id": "tim-mach",
+    "label": "Tim mạch",
+    "icon": "",
+    "description": "Bệnh lý tim mạch, tăng huyết áp, mạch vành, suy tim",
+    "color": "blue"
+  },
+  {
+    "id": "co-xuong-khop",
+    "label": "Cơ Xương Khớp",
+    "icon": "",
+    "description": "Thoái hóa khớp, gout, loãng xương, đau lưng, viêm khớp",
+    "color": "blue"
+  },
+  {
+    "id": "tai-mui-hong",
+    "label": "Tai Mũi Họng",
+    "icon": "",
+    "description": "Viêm mũi xoang, viêm amidan, viêm tai, ù tai, ngáy",
+    "color": "blue"
+  },
+  {
+    "id": "mat",
+    "label": "Mắt",
+    "icon": "",
+    "description": "Cận thị, đục thủy tinh thể, glaucoma, bệnh võng mạc",
+    "color": "blue"
+  },
+  {
+    "id": "nam-khoa",
+    "label": "Nam khoa",
+    "icon": "",
+    "description": "Tiết niệu nam, rối loạn cương, tiền liệt tuyến, vô sinh nam",
+    "color": "blue"
   }
 ]

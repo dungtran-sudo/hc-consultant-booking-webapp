@@ -55,7 +55,7 @@ Nếu bệnh nhân không nêu thuốc đã dùng, nhắc nhở CS hỏi lại v
 [Viết 3-5 câu BẰNG NGÔN NGỮ ĐƠN GIẢN mà nhân viên CS đọc trực tiếp cho bệnh nhân/người nhà qua điện thoại hoặc chat. Không dùng thuật ngữ y khoa. Bao gồm: (1) tóm tắt tình trạng, (2) mức độ khẩn cấp bằng lời dễ hiểu, (3) việc cần làm tiếp theo. VD: "Dạ, theo thông tin anh/chị cung cấp, bé có dấu hiệu... Trường hợp này cần được bác sĩ khám trong vòng... Em sẽ hỗ trợ đặt lịch khám tại..."]
 
 ## Chuyên khoa đề xuất đặt lịch
-[Ghi rõ chuyên khoa ưu tiên khám theo mã: nhi / da-lieu / sinh-san / std-sti / tieu-hoa. Nếu cần khám nhiều chuyên khoa, sắp xếp theo thứ tự ưu tiên.]
+[Ghi rõ chuyên khoa ưu tiên khám theo mã: nhi / da-lieu / sinh-san / std-sti / tieu-hoa / tim-mach / co-xuong-khop / tai-mui-hong / mat / nam-khoa. Nếu cần khám nhiều chuyên khoa, sắp xếp theo thứ tự ưu tiên.]
 
 ## Bệnh viện/phòng khám công lập gợi ý
 [Dựa trên khu vực sinh sống của bệnh nhân, đề xuất 2-3 bệnh viện hoặc phòng khám công lập phù hợp với chuyên khoa cần khám. Ghi rõ tên, địa chỉ, và lý do đề xuất.]

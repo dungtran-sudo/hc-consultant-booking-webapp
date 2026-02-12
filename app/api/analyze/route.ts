@@ -5,7 +5,7 @@ import { FormData } from '@/lib/types';
 import { checkBudget, logUsage } from '@/lib/usage';
 import { checkRateLimit, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
 
-const VALID_SPECIALTIES = ['nhi', 'da-lieu', 'sinh-san', 'std-sti', 'tieu-hoa'];
+const VALID_SPECIALTIES = ['nhi', 'da-lieu', 'sinh-san', 'std-sti', 'tieu-hoa', 'tim-mach', 'co-xuong-khop', 'tai-mui-hong', 'mat', 'nam-khoa'];
 
 export async function POST(request: Request) {
   try {
