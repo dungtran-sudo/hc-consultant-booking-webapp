@@ -114,6 +114,14 @@ export default function ConsultPage({
           <div ref={resultRef}>
             <AnalysisResult result={result} />
 
+             {/* Partner Search */}
+            <PartnerSearch
+              recommendedSpecialties={result.recommendedSpecialties}
+              onBooking={(partner, service) =>
+                setBookingPartner({ partner, service })
+              }
+            />
+
             {/* Partner Cards */}
             <div className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
@@ -140,13 +148,7 @@ export default function ConsultPage({
               )}
             </div>
 
-            {/* Partner Search */}
-            <PartnerSearch
-              recommendedSpecialties={result.recommendedSpecialties}
-              onBooking={(partner, service) =>
-                setBookingPartner({ partner, service })
-              }
-            />
+           
           </div>
         )}
 
