@@ -15,6 +15,7 @@ interface MaskedBookingEmail {
   preferredTime: string;
   branchAddress: string;
   partnerName: string;
+  partnerId: string;
 }
 
 export async function sendBookingEmail(
@@ -60,7 +61,7 @@ export async function sendBookingEmail(
             </tr>
           </table>
           <div style="margin-top: 24px; text-align: center;">
-            <a href="${portalUrl}/partner/dashboard" style="display: inline-block; background-color: #2563eb; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+            <a href="${portalUrl}/partner/login/${data.partnerId}" style="display: inline-block; background-color: #2563eb; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
               Xem chi tiết trên Portal
             </a>
           </div>

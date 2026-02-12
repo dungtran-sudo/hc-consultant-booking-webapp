@@ -88,6 +88,7 @@ export async function GET(request: Request) {
 
     const partnerName = await getPartnerName(partnerId);
     return NextResponse.json({
+      partnerId,
       bookings: bookings.map((b) => ({
         ...b,
         createdAt: b.createdAt.toISOString(),

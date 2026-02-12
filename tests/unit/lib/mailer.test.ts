@@ -21,6 +21,7 @@ describe('sendBookingEmail', () => {
     preferredTime: '09:00',
     branchAddress: '123 Test Street',
     partnerName: 'Vinmec',
+    partnerId: 'vinmec',
   };
 
   it('calls sendMail with correct recipient', async () => {

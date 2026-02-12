@@ -55,6 +55,7 @@ export default function PartnerDashboardPage() {
   const router = useRouter();
   const [bookings, setBookings] = useState<MaskedBooking[]>([]);
   const [partnerName, setPartnerName] = useState('');
+  const [partnerId, setPartnerId] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [revealedPII, setRevealedPII] = useState<Record<string, RevealedPII | null>>({});
@@ -94,12 +95,17 @@ export default function PartnerDashboardPage() {
     try {
       const r = await fetch(`/api/partner/bookings?${params}`);
       if (r.status === 401) {
-        router.push('/partner/login');
+        const savedPartnerId = localStorage.getItem('partnerId');
+        router.push(savedPartnerId ? `/partner/login/${savedPartnerId}` : '/partner/login');
         return;
       }
       const data = await r.json();
       setBookings(data.bookings || []);
       setPartnerName(data.partnerName || '');
+      if (data.partnerId) {
+        setPartnerId(data.partnerId);
+        localStorage.setItem('partnerId', data.partnerId);
+      }
       setTotal(data.total || 0);
       setTotalPages(data.totalPages || 1);
       if (data.statusCounts) setStatusCounts(data.statusCounts);
@@ -195,7 +201,7 @@ export default function PartnerDashboardPage() {
 
   const handleLogout = async () => {
     await fetch('/api/partner/logout', { method: 'POST' });
-    router.push('/partner/login');
+    router.push(partnerId ? `/partner/login/${partnerId}` : '/partner/login');
   };
 
   const totalBookings = statusCounts.pending + statusCounts.confirmed + statusCounts.completed + statusCounts.cancelled;

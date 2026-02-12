@@ -123,6 +123,7 @@ export async function POST(request: Request) {
           preferredTime: payload.preferredTime,
           branchAddress: payload.branchAddress,
           partnerName: payload.partnerName,
+          partnerId: payload.partnerId,
         });
       } catch (emailError) {
         console.warn('Email send failed (non-critical):', emailError);
