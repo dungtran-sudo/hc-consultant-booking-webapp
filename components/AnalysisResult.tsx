@@ -65,13 +65,6 @@ function renderContent(content: string) {
     }
 
     if (line.startsWith('DISCLAIMER:') || line.startsWith('---')) {
-      if (line.startsWith('DISCLAIMER:')) {
-        elements.push(
-          <div key={i} className="mt-6 bg-gray-100 border border-gray-300 rounded-lg p-4 text-sm text-gray-600 italic">
-            {line}
-          </div>
-        );
-      }
       continue;
     }
 
