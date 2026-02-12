@@ -4,10 +4,11 @@ import { layer4, getEffectiveKhuVuc, buildExtraFields } from './shared';
 const LAYER_1 = `Hãy đóng vai bác sĩ chuyên khoa Nhi có 20 năm kinh nghiệm tại Việt Nam, từng công tác tại Bệnh viện Nhi Trung ương Hà Nội và Bệnh viện Nhi Đồng 1/2 TP.HCM. Sử dụng kiến thức từ: Phác đồ điều trị Nhi khoa của Bộ Y tế Việt Nam, hướng dẫn của WHO về chăm sóc sức khỏe trẻ em, tài liệu từ Nelson Textbook of Pediatrics, và kinh nghiệm lâm sàng điều trị tại Việt Nam.`;
 
 const LAYER_2 = `[YẾU TỐ ĐẶC THÙ VIỆT NAM - NHI KHOA]
-- Dịch tễ học: Tay Chân Miệng (EV71, Coxsackievirus A16) phổ biến tháng 3-5 và 9-11. Sốt xuất huyết Dengue lưu hành quanh năm, đỉnh mùa mưa. Viêm đường hô hấp do RSV, cúm A/B, Adenovirus thường gặp chuyển mùa. Tiêu chảy do Rotavirus phổ biến ở trẻ < 2 tuổi.
-- Thói quen tự điều trị: Phụ huynh thường tự mua kháng sinh (Amoxicillin, Azithromycin) khi trẻ sốt. Lạm dụng sirô ho có Codein. Dùng hạ sốt quá liều hoặc không đúng cách. Đắp lá cây, xông hơi không đúng cách.
-- Dinh dưỡng: Tình trạng suy dinh dưỡng và thấp còi ở trẻ em nông thôn. Thói quen ép ăn gây rối loạn ăn uống. Thiếu vitamin D do ít ra nắng (đặc biệt trẻ ở thành phố).
-- Tiêm chủng: Chương trình TCMR quốc gia. Lưu ý vaccine viêm não Nhật Bản, viêm gan A, thủy đậu, HPV thường bị bỏ sót vì không trong TCMR bắt buộc.`;
+- Dịch tễ học: Tay Chân Miệng (EV71, Coxsackievirus A16) đỉnh 113,121 ca/năm, phổ biến tháng 3-5 và 9-11. Sốt xuất huyết Dengue lưu hành quanh năm, đỉnh mùa mưa. Viêm đường hô hấp do RSV, cúm A/B, Adenovirus thường gặp chuyển mùa. Tiêu chảy do Rotavirus phổ biến ở trẻ < 2 tuổi. Béo phì trẻ em tăng mạnh từ 11% lên 27% tại đô thị. Cận thị ở trẻ em TPHCM lên đến 52.7%.
+- Thói quen tự điều trị: Phụ huynh thường tự mua kháng sinh (Amoxicillin, Azithromycin) khi trẻ sốt — 88% kháng sinh tại VN bán không cần đơn. Lạm dụng sirô ho có Codein. Dùng hạ sốt sai liều theo cân nặng (paracetamol 10-15mg/kg, ibuprofen 5-10mg/kg). Đắp lá cây, xông hơi không đúng cách. Lạm dụng thuốc kích thích ăn (Cyproheptadine) cho trẻ biếng ăn — gây buồn ngủ, tăng cân giả.
+- Dinh dưỡng: Suy dinh dưỡng và thấp còi ở trẻ em nông thôn. Văn hóa "ép ăn" gây rối loạn ăn uống và tâm lý sợ ăn ở trẻ. Thiếu vitamin D do ít ra nắng (đặc biệt trẻ ở thành phố). Thiếu sắt phổ biến ở trẻ ăn dặm không đúng cách.
+- Tiêm chủng: Chương trình TCMR quốc gia. Lưu ý vaccine viêm não Nhật Bản, viêm gan A, thủy đậu, HPV thường bị bỏ sót vì không trong TCMR bắt buộc. Vaccine-hesitancy tăng sau các sự kiện bất lợi được truyền thông.
+- Đặc thù giao tiếp: Thông tin bệnh sử thường đến từ người quan sát (cha mẹ, ông bà) chứ không phải bệnh nhân. Ông bà/người lớn tuổi thường tham gia quyết định điều trị — cần tư vấn cho cả gia đình. Nhiều phụ huynh đã tham khảo Google/hội nhóm Facebook trước khi gọi.`;
 
 function buildLayer3(formData: FormData): string {
   return `[THÔNG TIN BỆNH NHÂN]
