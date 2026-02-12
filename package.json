@@ -12,6 +12,7 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "sync-partners": "npx tsx scripts/sync-partners.ts",
+    "seed-partners": "npx tsx scripts/seed-partners-db.ts",
     "postinstall": "npx prisma generate"
   },
   "dependencies": {
