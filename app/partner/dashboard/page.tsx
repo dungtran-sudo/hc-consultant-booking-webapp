@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ConfirmDialog from '@/components/ConfirmDialog';
@@ -64,44 +64,53 @@ const COMMISSION_STATUS_COLORS: Record<string, string> = {
 };
 
 function CommissionSection() {
-  const { statements, isLoading: loadingCommissions } = usePartnerCommissions();
+  const { statements, isLoading: loadingCommissions, error } = usePartnerCommissions();
 
-  if (loadingCommissions) return null;
-  if (statements.length === 0) return null;
+  if (error) return null;
 
   return (
     <div className="space-y-3">
       <h2 className="text-lg font-bold text-gray-900">Hoa hồng</h2>
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-4 py-3 text-left font-medium text-gray-600">Tháng/Năm</th>
-                <th className="px-4 py-3 text-right font-medium text-gray-600">Số booking</th>
-                <th className="px-4 py-3 text-right font-medium text-gray-600">Doanh thu</th>
-                <th className="px-4 py-3 text-right font-medium text-gray-600">Hoa hồng</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-600">Trạng thái</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {statements.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-gray-900">{s.month}/{s.year}</td>
-                  <td className="px-4 py-3 text-right text-gray-600">{s.completedBookings}</td>
-                  <td className="px-4 py-3 text-right text-gray-900">{s.totalRevenue.toLocaleString('vi-VN')}</td>
-                  <td className="px-4 py-3 text-right font-medium text-gray-900">{s.commissionAmount.toLocaleString('vi-VN')}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${COMMISSION_STATUS_COLORS[s.status] || 'bg-gray-100 text-gray-600'}`}>
-                      {COMMISSION_STATUS_LABELS[s.status] || s.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {loadingCommissions ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 text-sm">
+          Đang tải...
         </div>
-      </div>
+      ) : statements.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 text-sm">
+          Chưa có báo cáo hoa hồng
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">Tháng/Năm</th>
+                  <th className="px-4 py-3 text-right font-medium text-gray-600">Số booking</th>
+                  <th className="px-4 py-3 text-right font-medium text-gray-600">Doanh thu</th>
+                  <th className="px-4 py-3 text-right font-medium text-gray-600">Hoa hồng</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {statements.map((s) => (
+                  <tr key={s.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-gray-900">{s.month}/{s.year}</td>
+                    <td className="px-4 py-3 text-right text-gray-600">{s.completedBookings}</td>
+                    <td className="px-4 py-3 text-right text-gray-900">{s.totalRevenue.toLocaleString('vi-VN')}</td>
+                    <td className="px-4 py-3 text-right font-medium text-gray-900">{s.commissionAmount.toLocaleString('vi-VN')}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${COMMISSION_STATUS_COLORS[s.status] || 'bg-gray-100 text-gray-600'}`}>
+                        {COMMISSION_STATUS_LABELS[s.status] || s.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -400,8 +409,8 @@ export default function PartnerDashboardPage() {
                     const isUpdating = updatingId === b.id;
 
                     return (
-                      <>
-                        <tr key={b.id} className={`hover:bg-gray-50 ${isExpanded ? 'bg-blue-50/30' : ''}`}>
+                      <React.Fragment key={b.id}>
+                        <tr className={`hover:bg-gray-50 ${isExpanded ? 'bg-blue-50/30' : ''}`}>
                           <td className="px-4 py-3 font-mono text-blue-600 font-semibold text-xs whitespace-nowrap">
                             {b.bookingNumber}
                           </td>
@@ -488,7 +497,7 @@ export default function PartnerDashboardPage() {
                         </tr>
                         {/* Expanded PII row */}
                         {isExpanded && isRevealed && (
-                          <tr key={`${b.id}-pii`}>
+                          <tr>
                             <td colSpan={8} className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                               {isDeleted ? (
                                 <p className="text-sm text-gray-400">Dữ liệu đã được xóa theo yêu cầu của bệnh nhân.</p>
@@ -517,7 +526,7 @@ export default function PartnerDashboardPage() {
                             </td>
                           </tr>
                         )}
-                      </>
+                      </React.Fragment>
                     );
                   })}
                 </tbody>
