@@ -11,8 +11,8 @@ The platform has four user-facing portals:
 | Portal | URL | Purpose |
 |--------|-----|---------|
 | Consultation | `/consult/[specialty]` | CS/Doctor fills patient form, gets AI analysis, creates bookings |
-| Partner | `/partner/login` | Partner clinics manage their bookings, view patient data |
-| Admin | `/admin` | System admin manages bookings, staff, audit logs, form config |
+| Partner | `/partner/login` | Partner clinics manage their bookings, view patient data and commissions |
+| Admin | `/admin` | System admin manages bookings, staff, partners, commissions, audit logs, form config |
 | Patient Consent | `/consent/[token]` | Patient scans QR to consent to data sharing |
 
 ## Tech Stack
@@ -43,6 +43,9 @@ The platform has four user-facing portals:
 - **Session Token Expiry:** Partner sessions expire after 7 days, staff sessions after 24 hours
 - **Atomic LLM Budget Control:** Reserve/finalize/cancel pattern for predictable cost management
 - **Automated Data Cleanup:** Cron job with GDPR-complete deletion of expired data
+- **Partner Contract Lifecycle:** Track contract status (active/expired/inactive/pending) with auto-expiry
+- **Admin Partner Management:** Full CRUD for partners, branches, services, and portal access
+- **Commission Consolidation:** Monthly commission statements with draft → confirmed → paid workflow
 
 ## Quick Start
 
@@ -77,7 +80,7 @@ Open http://localhost:3000.
 
 ## Database
 
-Prisma v7 with Neon serverless adapter. 11 models:
+Prisma v7 with Neon serverless adapter. 12 models:
 
 - **Booking** — Encrypted patient bookings with status tracking
 - **Consent** — Patient data sharing consent records
@@ -86,9 +89,10 @@ Prisma v7 with Neon serverless adapter. 11 models:
 - **EncryptionKey** — Per-patient AES-256-GCM key material
 - **AuditLog** — Comprehensive action audit trail
 - **DeletionRequest** — GDPR-style patient data deletion requests
-- **Partner** — Partner clinics with auth and metadata
+- **Partner** — Partner clinics with contract lifecycle and commission rate
 - **PartnerBranch** — Multi-branch clinic locations
 - **PartnerService** — Services offered per partner per specialty
+- **CommissionStatement** — Monthly commission tracking (draft → confirmed → paid)
 - **ApiUsageLog** — LLM usage tracking with cost estimation
 - **RateLimit** — Per-IP rate limiting state
 
@@ -112,6 +116,8 @@ app/
   admin/
     page.tsx                        # Admin dashboard
     bookings/page.tsx               # Booking management
+    partners/page.tsx               # Partner management (CRUD, contracts, branches, services)
+    commissions/page.tsx            # Commission consolidation and tracking
     staff/page.tsx                  # Staff management
     audit/page.tsx                  # Audit logs
     consents/page.tsx               # Consent records
@@ -124,10 +130,16 @@ app/
     partner/                        # Partner APIs (bookings, PII reveal, auth)
     partners/route.ts               # GET: Partner search and listing
     staff/                          # Staff auth APIs
-    admin/                          # Admin APIs (stats, bookings, staff, audit)
+    admin/                          # Admin APIs (stats, bookings, partners, commissions, staff, audit)
       bookings/[id]/route.ts        # PATCH/DELETE: Manage individual bookings
+      partners/route.ts             # GET/POST: Partner list and creation
+      partners/[id]/route.ts        # GET/PATCH: Partner detail and update
+      partners/[id]/branches/       # POST/PATCH/DELETE: Branch CRUD
+      partners/[id]/services/       # POST/PATCH/DELETE: Service CRUD
+      commissions/route.ts          # GET/POST: Commission list and consolidation
+      commissions/[id]/route.ts     # GET/PATCH: Commission detail and update
       staff/route.ts                # GET/POST: Staff management
-    cron/cleanup/route.ts           # Automated GDPR-complete data cleanup
+    cron/cleanup/route.ts           # Automated GDPR-complete data cleanup + contract auto-expiry
 
 components/
   PartnerSearch.tsx                 # Partner search and selection component

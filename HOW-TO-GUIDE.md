@@ -87,6 +87,11 @@ npm start
 | `/api/booking` | POST — booking endpoint |
 | `/api/admin/form-config` | GET/POST — form config API |
 | `/api/cron/cleanup` | Cron — PII cleanup endpoint |
+| `/admin/partners` | Admin partner management (CRUD) |
+| `/admin/commissions` | Admin commission consolidation |
+| `/api/admin/partners` | GET/POST — admin partner API |
+| `/api/admin/commissions` | GET/POST — admin commission API |
+| `/api/partner/commissions` | GET — partner commission view |
 | `/api/partners` | GET — partner list endpoint |
 
 ---
@@ -111,7 +116,22 @@ Field types available: `text`, `number`, `select`, `textarea`, `checkbox-group`.
 
 The admin page uses Bearer token authentication. Set the `ADMIN_SECRET` environment variable and include the token in the `Authorization` header when accessing admin endpoints.
 
-### 2. Partner Data (via Google Sheet)
+### 2. Partner Data (via Admin Page)
+
+Partners can now be managed directly from the admin portal:
+
+1. Go to `/admin/partners`
+2. Click **"+ Them doi tac"** to create a new partner (provide ID + name)
+3. Click any partner row to open the **detail panel** with 5 tabs:
+   - **Thong tin** — basic info (name, type, website, email, phone, address, specialties)
+   - **Hop dong** — contract status, dates, commission rate
+   - **Chi nhanh** — add/delete branches
+   - **Dich vu** — add/delete services
+   - **Portal** — set/reset/remove partner login password
+4. Use filters to search by name, type, city, contract status, or active status
+5. Toggle a partner's active status directly from the table
+
+### 3. Partner Data (via Google Sheet — legacy)
 
 Partner data lives in Google Sheets and syncs to the app via a script.
 
@@ -145,7 +165,7 @@ This reads all 3 tabs, groups branches and services by partner, and writes `data
 
 After syncing, commit and push to deploy.
 
-### 3. Specialties
+### 4. Specialties
 
 Edit `data/specialties.json` directly. Each specialty has:
 
@@ -159,11 +179,11 @@ Edit `data/specialties.json` directly. Each specialty has:
 }
 ```
 
-### 4. Booking Email Template
+### 5. Booking Email Template
 
 Edit `lib/mailer.ts`. The email uses inline HTML/CSS with the "Hello Bac Si" blue header banner.
 
-### 5. AI Prompt Templates
+### 6. AI Prompt Templates
 
 Each specialty has its own prompt file in `lib/prompts/`:
 
@@ -238,9 +258,9 @@ app/
   admin/
     page.tsx                        — admin portal (form config editor)
     bookings/page.tsx               — admin bookings management
-    bookings/[id]/page.tsx          — admin booking detail
+    partners/page.tsx               — admin partner management (CRUD + contracts)
+    commissions/page.tsx            — admin commission consolidation & tracking
     staff/page.tsx                  — admin staff management
-    partners/page.tsx               — admin partners management
   consent/
     [token]/page.tsx                — patient consent page
   api/

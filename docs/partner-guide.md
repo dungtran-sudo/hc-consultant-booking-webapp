@@ -153,6 +153,28 @@ Email duoc gui tu dia chi Gmail cua he thong.
 
 ---
 
+## Hoa hong
+
+Neu doi tac co thiet lap ty le hoa hong, muc **"Hoa hong"** se hien thi phia duoi bang dat lich tren dashboard.
+
+### Thong tin hien thi
+
+| Cot | Mo ta |
+|-----|-------|
+| Thang/Nam | Thang va nam cua bao cao |
+| So booking | So luong booking hoan thanh trong thang |
+| Doanh thu | Tong doanh thu (do admin nhap) |
+| Hoa hong | So tien hoa hong = Doanh thu × Ty le % |
+| Trang thai | Da xac nhan / Da thanh toan |
+
+### Luu y
+- Chi hien thi bao cao da duoc admin **xac nhan** hoac **da thanh toan**
+- Bao cao o trang thai **Nhap** se khong hien thi cho doi tac
+- Day la bang **chi doc** — doi tac khong the chinh sua bao cao
+- Neu co thac mac ve so lieu, vui long lien he quan tri vien
+
+---
+
 ## Cac luu y quan trong
 
 1. **Bao mat:** Khong chia se tai khoan dang nhap voi nguoi khac
