@@ -74,6 +74,15 @@ export async function GET(request: Request) {
       where: { windowStart: { lt: oneDayAgo } },
     });
 
+    // Auto-expire partner contracts
+    const expiredContracts = await prisma.partner.updateMany({
+      where: {
+        contractStatus: 'active',
+        contractEndDate: { not: null, lte: now },
+      },
+      data: { contractStatus: 'expired' },
+    });
+
     await prisma.auditLog.create({
       data: {
         actorType: 'system',
@@ -84,6 +93,7 @@ export async function GET(request: Request) {
           phoneHashesProcessed: phoneHashes.length,
           usageLogsDeleted: deletedUsageLogs.count,
           rateLimitsDeleted: deletedRateLimits.count,
+          contractsExpired: expiredContracts.count,
         }),
         ip: 'system',
       },

@@ -150,3 +150,20 @@ export interface RevealedPII {
   conditionSummary: string;
   notes: string;
 }
+
+export interface CommissionStatement {
+  id: string;
+  partnerId: string;
+  partnerName: string;
+  month: number;
+  year: number;
+  completedBookings: number;
+  totalRevenue: number;
+  commissionRate: number;
+  commissionAmount: number;
+  status: string;
+  notes: string;
+  generatedAt: string;
+  confirmedAt: string | null;
+  paidAt: string | null;
+}

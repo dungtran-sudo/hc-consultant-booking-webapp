@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const search = url.searchParams.get('search') || '';
 
-  const where: Record<string, unknown> = { isActive: true };
+  const where: Record<string, unknown> = { isActive: true, contractStatus: 'active' };
   if (search.trim().length >= 2) {
     where.name = { contains: search.trim(), mode: 'insensitive' };
   }

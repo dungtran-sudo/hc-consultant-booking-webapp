@@ -18,6 +18,7 @@ export async function GET(request: Request) {
   const partners = await prisma.partner.findMany({
     where: {
       isActive: true,
+      contractStatus: 'active',
       specialties: { hasSome: specialties },
     },
     include: { branches: true, services: true },

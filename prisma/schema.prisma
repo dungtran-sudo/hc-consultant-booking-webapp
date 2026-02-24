@@ -149,13 +149,23 @@ model Partner {
   notes        String   @default("")
   passwordHash String?
   isActive     Boolean  @default(true)
+  // Contract tracking
+  contractStatus    String    @default("active")
+  contractStartDate DateTime?
+  contractEndDate   DateTime?
+  contractNotes     String    @default("")
+  // Commission
+  commissionRate    Float     @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  branches PartnerBranch[]
-  services PartnerService[]
+  branches             PartnerBranch[]
+  services             PartnerService[]
+  commissionStatements CommissionStatement[]
 
   @@index([city])
+  @@index([contractStatus])
+  @@index([contractEndDate])
   @@map("partners")
 }
 
@@ -220,4 +230,29 @@ model RateLimit {
 
   @@index([windowStart])
   @@map("rate_limits")
+}
+
+model CommissionStatement {
+  id                 String    @id @default(cuid())
+  partnerId          String
+  partnerName        String
+  month              Int
+  year               Int
+  completedBookings  Int       @default(0)
+  totalRevenue       Float     @default(0)
+  commissionRate     Float     @default(0)
+  commissionAmount   Float     @default(0)
+  status             String    @default("draft")
+  notes              String    @default("")
+  generatedAt        DateTime  @default(now())
+  confirmedAt        DateTime?
+  paidAt             DateTime?
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@unique([partnerId, month, year])
+  @@index([partnerId])
+  @@index([month, year])
+  @@index([status])
+  @@map("commission_statements")
 }
